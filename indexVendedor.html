@@ -6,6 +6,7 @@
     <title>LabLog v7.1 - Final Stable</title>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         :root {
@@ -103,6 +104,13 @@
         /* Login */
         #login-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
         .login-box { background: white; padding: 40px; border-radius: 16px; width: 350px; text-align: center; }
+        /* --- ESTILOS DO CRM DE VENDAS --- */
+.crm-header { background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+.crm-profile-grid { display: grid; grid-template-columns: 80px 1fr; gap: 20px; align-items: center; }
+.crm-avatar { width: 80px; height: 80px; background: var(--primary); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; }
+
+.visit-card { border-left: 4px solid var(--accent); background: #f8fafc; padding: 10px; margin-bottom: 8px; border-radius: 4px; }
+.suggestion-box { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 15px; border-radius: 8px; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -137,28 +145,76 @@
         </header>
 
         <div id="v-vendas" class="view">
-            <div style="display:flex; justify-content:space-between; margin-bottom:20px">
-                <h2><i class="fas fa-chart-bar"></i> Gestão Comercial</h2>
-                <div class="upload-zone" onclick="document.getElementById('file-sales').click()" style="padding: 10px 20px; border: 1px dashed var(--primary); border-radius:8px; cursor:pointer;">
-                    <i class="fas fa-upload"></i> Importar CSV Vendas
-                    <input type="file" id="file-sales" hidden onchange="app.importCSV('sales', this)">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
+        <h2><i class="fas fa-briefcase"></i> Portal do Vendedor</h2>
+        <select id="sales-client-select" style="width: auto; padding: 10px;" onchange="app.selectSalesClient()">
+            <option value="">Selecione o Cliente para visitar...</option>
+            </select>
+    </div>
+
+    <div id="crm-panel" style="display:none">
+        
+        <div class="crm-header">
+            <div class="crm-profile-grid">
+                <div class="crm-avatar" id="crm-avatar">ST</div>
+                <div>
+                    <h2 id="crm-name" style="margin:0">Strike Óticas</h2>
+                    <span class="badge" id="crm-route" style="background:#eee">ROTA BEGE</span>
+                    
+                    <div class="grid-3" style="margin-top:10px">
+                        <input type="date" id="crm-niver" title="Aniversário do Dono">
+                        <input type="text" id="crm-filhos" placeholder="Qtd Filhos / Info Pessoal">
+                        <button class="btn btn-primary" style="padding: 5px 10px;" onclick="app.saveCRMInfo()">💾 Salvar Obs.</button>
+                    </div>
                 </div>
             </div>
-            <div class="grid-4">
-                <div class="card" style="border-left:5px solid var(--money)">
-                    <div style="color:#64748b; font-size:0.9rem">FATURAMENTO</div>
-                    <div id="kpi-fat" style="font-size:2rem; font-weight:800; color:#0f172a">R$ 0,00</div>
-                </div>
-                <div class="card" style="border-left:5px solid var(--accent)">
-                    <div style="color:#64748b; font-size:0.9rem">TICKET MÉDIO</div>
-                    <div id="kpi-ticket" style="font-size:2rem; font-weight:800; color:#0f172a">R$ 0,00</div>
-                </div>
-            </div>
-            <div class="card">
-                <h3>🏆 Produtos Mais Vendidos</h3>
-                <div id="rank-products"><p style="color:#aaa">Importe dados para ver o ranking.</p></div>
+            <div class="suggestion-box">
+                <i class="fas fa-lightbulb"></i> <b>Sugestão de Venda:</b> <span id="crm-suggestion">Analisando perfil...</span>
             </div>
         </div>
+
+        <div class="grid-3">
+            <div class="card" style="padding:15px; text-align:center">
+                <small style="color:#888">TICKET MÉDIO</small>
+                <div id="crm-ticket" style="font-size:1.5rem; font-weight:bold; color:var(--primary)">R$ 0,00</div>
+            </div>
+            <div class="card" style="padding:15px; text-align:center">
+                <small style="color:#888">FATURAMENTO MENSAL</small>
+                <div id="crm-fat" style="font-size:1.5rem; font-weight:bold; color:var(--money)">R$ 0,00</div>
+            </div>
+            <div class="card" style="padding:15px; text-align:center">
+                <small style="color:#888">MAIS COMPRADO</small>
+                <div id="crm-top-prod" style="font-size:1.1rem; font-weight:bold; color:var(--accent)">-</div>
+            </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:20px; grid-template-columns: 2fr 1fr;">
+            <div class="card">
+                <h3>📊 Performance de Compras</h3>
+                <canvas id="salesChart" style="max-height: 250px;"></canvas>
+            </div>
+
+            <div class="card">
+                <h3>⚡ Ações Rápidas</h3>
+                <button class="btn btn-primary" style="width:100%; margin-bottom:10px" onclick="app.registerVisit()">
+                    <i class="fas fa-map-marker-alt"></i> Registrar Visita
+                </button>
+                <button class="btn btn-warning" style="width:100%; margin-bottom:10px; background:var(--warning); color:#fff" onclick="app.requestDiscount()">
+                    <i class="fas fa-percentage"></i> Pedir Desconto (Email)
+                </button>
+                
+                <hr>
+                <h4>Histórico de Visitas</h4>
+                <div id="visits-list" style="max-height:150px; overflow-y:auto"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="crm-empty" style="text-align:center; padding:50px; opacity:0.5">
+        <i class="fas fa-user-friends fa-4x"></i>
+        <h3>Selecione um cliente acima para ver os dados</h3>
+    </div>
+</div>
 
         <div id="v-monitor" class="view">
             <div id="monitor-bg" class="monitor-layout">
@@ -272,6 +328,7 @@
 <script>
 const app = {
     data: {
+        visits: [], // Histórico de visitas
         clients: [{ id: "712", name: "Strike Óticas", route: "BEGE" }, { id: "101", name: "Visão Total", route: "AMARELO" }],
         orders: [], reqs: [], losses: [], feedbacks: [],
         salesHistory: [ { prod: "Lente VS", val: 150, cli: "Strike" } ],
@@ -408,6 +465,34 @@ const app = {
         document.getElementById('rank-products').innerHTML = sorted.map((p, i) => `<div class="product-rank-item"><b>${i+1}. ${p[0]}</b> - ${p[1]} un.</div>`).join('');
     },
 
+    // --- MÓDULO CRM VENDAS (V6.0 ATUALIZADO) ---
+    
+    // 1. Popula o Select de Clientes ao abrir a aba
+    loadSalesClients: function() {
+        const sel = document.getElementById('sales-client-select');
+        sel.innerHTML = '<option value="">Selecione o Cliente...</option>' + 
+            this.data.clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    },
+
+    // 2. Quando seleciona um cliente na lista
+    selectSalesClient: function() {
+        const id = document.getElementById('sales-client-select').value;
+        const panel = document.getElementById('crm-panel');
+        const empty = document.getElementById('crm-empty');
+        
+        if(!id) { panel.style.display='none'; empty.style.display='block'; return; }
+        
+        panel.style.display='block'; empty.style.display='none';
+        
+        const client = this.data.clients.find(c => c.id === id);
+        
+        // Preencher Perfil
+        document.getElementById('crm-name').innerText = client.name;
+        document.getElementById('crm-route').innerText = "ROTA " + client.route;
+        document.getElementById('crm-avatar').innerText = client.name.substring(0,2).toUpperCase();
+        
+        // Preencher CRM (Dados Pessoais)
+
     handleTagInput: function(e) { if(e.key==='Enter'||e.key===','||e.key===' '){e.preventDefault(); const v=e.target.value.trim().toUpperCase(); if(v&&!this.data.tags.includes(v)){this.data.tags.push(v); this.renderTags(); const o=this.data.orders.find(o=>o.id===v); if(o){o.sel=true; this.save(); this.renderExped();}} e.target.value="";} if(e.key==='Backspace'&&e.target.value===""&&this.data.tags.length>0){this.data.tags.pop(); this.renderTags();} },
     removeTag: function(tag) { this.data.tags=this.data.tags.filter(t=>t!==tag); this.renderTags(); const o=this.data.orders.find(o=>o.id===tag); if(o){o.sel=false; this.save(); this.renderExped();} },
     renderTags: function() { const area=document.getElementById('tag-area'), inp=document.getElementById('exp-input'); area.innerHTML=''; this.data.tags.forEach(t=>{const el=document.createElement('div'); el.className='tag-chip'; el.innerHTML=`${t} <span class="tag-remove" onclick="app.removeTag('${t}')">×</span>`; area.appendChild(el);}); area.appendChild(inp); inp.focus(); },
@@ -438,3 +523,4 @@ app.init();
 </script>
 </body>
 </html>
+
