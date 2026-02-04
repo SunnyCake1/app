@@ -328,10 +328,10 @@
 <script>
 const app = {
     data: {
-        visits: [], // Histórico de visitas
+        visits: [],
         clients: [{ id: "712", name: "Strike Óticas", route: "BEGE" }, { id: "101", name: "Visão Total", route: "AMARELO" }],
         orders: [], reqs: [], losses: [], feedbacks: [],
-        salesHistory: [ { prod: "Lente VS", val: 150, cli: "Strike" } ],
+        salesHistory: [ { prod: "Lente VS", val: 150, cli: "Strike Óticas" } ],
         tags: [], filter: 'TODOS',
         routes: [
             { name: "CORAL / LILÁS", c1: "#ff7f50", c2: "#dcd0ff", s: "16:15:01", e: "09:00:00" },
@@ -345,12 +345,10 @@ const app = {
         const saved = localStorage.getItem('lablog_v7');
         if(saved) this.data = { ...this.data, ...JSON.parse(saved) };
         
-        // Iniciar Loops
         setInterval(() => this.monitorLoop(), 1000);
         setInterval(() => this.feedLoop(), 8000);
         setInterval(() => this.updateTimers(), 1000);
         
-        // Renderizar Inicial
         this.renderTags(); 
         this.renderExped();
     },
@@ -388,7 +386,7 @@ const app = {
         document.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
         document.getElementById('v-'+view).classList.add('active');
         document.getElementById('page-title').innerText = view.toUpperCase();
-        if(view === 'vendas') this.renderSalesDashboard();
+        if(view === 'vendas') { this.renderSalesDashboard(); this.loadSalesClients(); }
         if(view === 'perdas') this.renderLosses();
         if(view === 'reqs') this.renderReqs();
         if(view === 'admin') this.renderAdminRoutes();
@@ -419,15 +417,14 @@ const app = {
             r.e = document.getElementById(`r-e-${i}`).value;
         });
         this.save(); alert("Rotas atualizadas!");
-        document.getElementById('monitor-schedule-list').innerHTML = ''; // Force update
+        document.getElementById('monitor-schedule-list').innerHTML = ''; 
     },
 
-    // --- MONITOR ENGINE ---
+    // --- MONITOR ---
     monitorLoop: function() {
         const now = new Date();
         const sec = (now.getHours()*3600) + (now.getMinutes()*60) + now.getSeconds();
         
-        // Renderiza lista lateral se vazia
         const listEl = document.getElementById('monitor-schedule-list');
         if(listEl.innerHTML === '') {
             listEl.innerHTML = this.data.routes.map(r => `<div class="monitor-side-item"><div class="color-dot" style="background:${r.c1}"></div><span>${r.name}</span><span style="font-size:0.9rem;opacity:0.8;margin-left:auto">${r.e.substring(0,5)}</span></div>`).join('');
@@ -448,13 +445,11 @@ const app = {
             
             const timerDiv = document.getElementById('monitor-timer');
             timerDiv.innerText = `${this.pad(h)}:${this.pad(m)}:${this.pad(s)}`;
-            
-            // Alerta 15 min
             if(diff <= 900000) timerDiv.classList.add('timer-blink-red'); else timerDiv.classList.remove('timer-blink-red');
         }
     },
 
-    // --- EXPEDIÇÃO, VENDAS E OUTROS ---
+    // --- VENDAS DASHBOARD GERAL ---
     renderSalesDashboard: function() {
         const totalFat = this.data.salesHistory.reduce((a,b) => a + b.val, 0);
         const totalVol = this.data.salesHistory.length;
@@ -465,16 +460,13 @@ const app = {
         document.getElementById('rank-products').innerHTML = sorted.map((p, i) => `<div class="product-rank-item"><b>${i+1}. ${p[0]}</b> - ${p[1]} un.</div>`).join('');
     },
 
-    // --- MÓDULO CRM VENDAS (V6.0 ATUALIZADO) ---
-    
-    // 1. Popula o Select de Clientes ao abrir a aba
+    // --- CRM VENDEDOR (FUNÇÃO QUE ESTAVA QUEBRADA) ---
     loadSalesClients: function() {
         const sel = document.getElementById('sales-client-select');
         sel.innerHTML = '<option value="">Selecione o Cliente...</option>' + 
             this.data.clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
     },
 
-    // 2. Quando seleciona um cliente na lista
     selectSalesClient: function() {
         const id = document.getElementById('sales-client-select').value;
         const panel = document.getElementById('crm-panel');
@@ -486,13 +478,98 @@ const app = {
         
         const client = this.data.clients.find(c => c.id === id);
         
-        // Preencher Perfil
+        // Perfil
         document.getElementById('crm-name').innerText = client.name;
         document.getElementById('crm-route').innerText = "ROTA " + client.route;
         document.getElementById('crm-avatar').innerText = client.name.substring(0,2).toUpperCase();
         
-        // Preencher CRM (Dados Pessoais)
+        // Restaurar dados salvos (obs)
+        document.getElementById('crm-niver').value = client.niver || '';
+        document.getElementById('crm-filhos').value = client.filhos || '';
 
+        // Cálculos Específicos do Cliente
+        const sales = this.data.salesHistory.filter(s => s.cli === client.name);
+        const fat = sales.reduce((a,b) => a + b.val, 0);
+        const ticket = sales.length ? (fat / sales.length) : 0;
+
+        // Top Produto Cliente
+        const counts = {}; sales.forEach(s => { counts[s.prod] = (counts[s.prod] || 0) + 1; });
+        const topProd = Object.entries(counts).sort((a,b) => b[1] - a[1])[0];
+
+        document.getElementById('crm-fat').innerText = "R$ " + fat.toFixed(2);
+        document.getElementById('crm-ticket').innerText = "R$ " + ticket.toFixed(2);
+        document.getElementById('crm-top-prod').innerText = topProd ? topProd[0] : "-";
+
+        // Sugestão Inteligente
+        let suggestion = "Ofereça lentes de visão simples para girar estoque.";
+        if(ticket > 300) suggestion = "Cliente premium! Ofereça antirreflexo de alto valor.";
+        if(sales.length === 0) suggestion = "Cliente inativo! Ofereça desconto de reativação.";
+        document.getElementById('crm-suggestion').innerText = suggestion;
+
+        // Histórico de Visitas
+        this.renderVisits(id);
+        
+        // Renderizar Gráfico (Chart.js)
+        this.renderChart(sales);
+    },
+
+    saveCRMInfo: function() {
+        const id = document.getElementById('sales-client-select').value;
+        const client = this.data.clients.find(c => c.id === id);
+        if(client) {
+            client.niver = document.getElementById('crm-niver').value;
+            client.filhos = document.getElementById('crm-filhos').value;
+            this.save();
+            alert('Dados do cliente salvos!');
+        }
+    },
+
+    registerVisit: function() {
+        const id = document.getElementById('sales-client-select').value;
+        const client = this.data.clients.find(c => c.id === id);
+        if(client) {
+            const note = prompt("Resumo da visita:");
+            if(note) {
+                this.data.visits.unshift({ cliId: id, date: new Date().toLocaleDateString(), note });
+                this.save();
+                this.renderVisits(id);
+            }
+        }
+    },
+
+    renderVisits: function(cliId) {
+        const list = document.getElementById('visits-list');
+        const visits = this.data.visits.filter(v => v.cliId === cliId);
+        list.innerHTML = visits.map(v => `<div class="visit-card"><small>${v.date}</small><br>${v.note}</div>`).join('') || '<small>Nenhuma visita registrada.</small>';
+    },
+
+    requestDiscount: function() {
+        alert("Email de solicitação de desconto enviado para a gerência!");
+    },
+
+    renderChart: function(sales) {
+        const ctx = document.getElementById('salesChart');
+        // Se já existir gráfico anterior, destruir (para não sobrepor)
+        if(window.myChart) window.myChart.destroy();
+        
+        // Agrupar vendas por produto
+        const dataMap = {};
+        sales.forEach(s => { dataMap[s.prod] = (dataMap[s.prod] || 0) + s.val; });
+
+        window.myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(dataMap),
+                datasets: [{
+                    label: 'Faturamento por Produto (R$)',
+                    data: Object.values(dataMap),
+                    backgroundColor: '#38bdf8'
+                }]
+            }
+        });
+    },
+
+    // --- OUTRAS FUNÇÕES ---
     handleTagInput: function(e) { if(e.key==='Enter'||e.key===','||e.key===' '){e.preventDefault(); const v=e.target.value.trim().toUpperCase(); if(v&&!this.data.tags.includes(v)){this.data.tags.push(v); this.renderTags(); const o=this.data.orders.find(o=>o.id===v); if(o){o.sel=true; this.save(); this.renderExped();}} e.target.value="";} if(e.key==='Backspace'&&e.target.value===""&&this.data.tags.length>0){this.data.tags.pop(); this.renderTags();} },
     removeTag: function(tag) { this.data.tags=this.data.tags.filter(t=>t!==tag); this.renderTags(); const o=this.data.orders.find(o=>o.id===tag); if(o){o.sel=false; this.save(); this.renderExped();} },
     renderTags: function() { const area=document.getElementById('tag-area'), inp=document.getElementById('exp-input'); area.innerHTML=''; this.data.tags.forEach(t=>{const el=document.createElement('div'); el.className='tag-chip'; el.innerHTML=`${t} <span class="tag-remove" onclick="app.removeTag('${t}')">×</span>`; area.appendChild(el);}); area.appendChild(inp); inp.focus(); },
@@ -521,6 +598,11 @@ const app = {
 // Start
 app.init();
 </script>
+
+// Start
+app.init();
+</script>
 </body>
 </html>
+
 
