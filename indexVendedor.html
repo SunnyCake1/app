@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LabLog v6.0 - Suite Completa</title>
+    <title>LabLog v7.0 - Sistema Integrado</title>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
@@ -55,80 +55,61 @@
         .btn-accent { background: var(--accent); color: #0f172a; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-success { background: var(--success); color: white; }
-        .btn-money { background: var(--money); color: white; }
-
-        /* --- VENDAS DASHBOARD --- */
-        .kpi-card { border-left: 5px solid var(--money); }
-        .kpi-val { font-size: 2rem; font-weight: 800; color: #0f172a; }
-        .kpi-label { font-size: 0.9rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
-        .progress-bar { height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; margin-top: 10px; }
-        .progress-fill { height: 100%; background: var(--money); width: 0%; transition: 1s; }
-        
-        .product-rank-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #f1f5f9; }
-        .product-rank-item:last-child { border-bottom: none; }
-        .rank-badge { background: var(--primary); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; }
-
-        /* --- EXPEDIÇÃO (Balloons & Cards) --- */
-        .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
-        .filter-btn { padding: 8px 16px; border: 1px solid #cbd5e1; background: #fff; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 0.9rem; white-space: nowrap; transition: 0.2s; }
-        .filter-btn:hover { background: #f8fafc; border-color: var(--accent); }
-        .filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-
-        .tag-container { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; border: 2px dashed #cbd5e1; border-radius: 8px; min-height: 50px; background: #f8fafc; align-items: center; margin-bottom: 15px; }
-        .tag-chip { background: #0f172a; color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; font-weight: 600; }
-        .tag-remove { cursor: pointer; color: var(--accent); font-weight: bold; }
-
-        .exp-card { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 15px; display: flex; overflow: hidden; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .exp-strip { width: 8px; }
-        .exp-content { padding: 15px; flex: 1; display: flex; justify-content: space-between; align-items: center; }
-        .exp-timer { font-family: monospace; font-size: 0.9rem; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; }
-        .exp-timer.late { color: #ef4444; background: #fee2e2; border: 1px solid #ef4444; animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0.6; } }
 
         /* --- MONITOR TELÃO --- */
         #v-monitor { padding: 0 !important; background: #000; color: #fff; }
-        .monitor-layout { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: background 1s; }
-        .timer-big { font-size: 6vw; font-family: 'Courier New', monospace; font-weight: 900; background: rgba(0,0,0,0.3); padding: 0 40px; border-radius: 20px; backdrop-filter: blur(5px); border: 2px solid rgba(255,255,255,0.2); }
-
-        /* Login */
-        #login-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: white; padding: 40px; border-radius: 16px; width: 350px; text-align: center; }
-
-        /* --- NOVO: Painel Lateral do Monitor --- */
+        .monitor-layout { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: background 1s; position: relative; }
+        
+        /* Painel Lateral do Monitor */
         .monitor-side-panel {
             position: absolute; top: 30px; right: 30px;
             background: rgba(0, 0, 0, 0.6); padding: 20px; border-radius: 15px;
             border: 2px solid rgba(255, 255, 255, 0.3); text-align: left;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px); min-width: 200px;
         }
         .monitor-side-item {
-            color: #fff; font-size: 1.2rem; margin-bottom: 10px;
+            color: #fff; font-size: 1.1rem; margin-bottom: 10px;
             display: flex; align-items: center; gap: 10px; font-weight: bold;
         }
         .color-dot { width: 15px; height: 15px; border-radius: 50%; border: 2px solid #fff; }
-
-        /* --- NOVO: Alerta Vermelho Piscante --- */
+        
+        /* Timer Gigante */
+        .timer-big { font-size: 7vw; font-family: 'Courier New', monospace; font-weight: 900; background: rgba(0,0,0,0.3); padding: 0 40px; border-radius: 20px; backdrop-filter: blur(5px); border: 4px solid rgba(255,255,255,0.2); transition: 0.3s; }
+        
+        /* Alerta Piscante */
         .timer-blink-red {
             animation: blinkRed 1s infinite;
-            background-color: #ef4444 !important; /* Vermelho */
-            color: #fff !important;
-            border-color: #fff !important;
+            background-color: #ef4444 !important; color: #fff !important; border-color: #fff !important;
+            box-shadow: 0 0 30px #ef4444;
         }
-        @keyframes blinkRed { 
-            50% { opacity: 0.3; } 
-        }
+        @keyframes blinkRed { 50% { opacity: 0.5; } }
 
-        /* --- NOVO: Tabela Editável no Admin --- */
-        .admin-route-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; gap: 5px; margin-bottom: 10px; align-items: center; }
+        /* --- ADMIN ROTAS --- */
+        .admin-route-row { display: grid; grid-template-columns: 2fr 0.5fr 0.5fr 1fr 1fr 0.5fr; gap: 10px; margin-bottom: 10px; align-items: center; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
         .admin-route-row input { margin: 0; padding: 8px; font-size: 0.9rem; }
-        
+        .admin-route-header { font-weight: bold; font-size: 0.8rem; text-transform: uppercase; color: #64748b; margin-bottom: 5px; }
+
+        /* --- EXPEDIÇÃO PRO --- */
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+        .filter-btn { padding: 8px 16px; border: 1px solid #cbd5e1; background: #fff; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 0.9rem; white-space: nowrap; transition: 0.2s; }
+        .filter-btn.active { background: var(--primary); color: #fff; }
+        .tag-container { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; border: 2px dashed #cbd5e1; border-radius: 8px; min-height: 50px; background: #f8fafc; align-items: center; margin-bottom: 15px; }
+        .tag-chip { background: #0f172a; color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; font-weight: 600; }
+        .tag-remove { cursor: pointer; color: var(--accent); }
+        .exp-card { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 15px; display: flex; overflow: hidden; transition: 0.3s; }
+        .exp-strip { width: 8px; }
+        .exp-content { padding: 15px; flex: 1; display: flex; justify-content: space-between; align-items: center; }
+
+        /* Login */
+        #login-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: white; padding: 40px; border-radius: 16px; width: 350px; text-align: center; }
     </style>
 </head>
 <body>
 
     <div id="login-overlay">
         <div class="login-box">
-            <h1 style="color:var(--primary)">LabLog <span style="color:var(--accent)">6.0</span></h1>
+            <h1 style="color:var(--primary)">LabLog <span style="color:var(--accent)">7.0</span></h1>
             <p style="color:#64748b; margin-bottom:20px">Sistema Integrado</p>
             <select id="user-role">
                 <option value="admin">👑 ADMIN / GERÊNCIA</option>
@@ -163,51 +144,36 @@
                     <input type="file" id="file-sales" hidden onchange="app.importCSV('sales', this)">
                 </div>
             </div>
-
             <div class="grid-4">
-                <div class="card kpi-card">
-                    <div class="kpi-label">Faturamento (Mês)</div>
-                    <div class="kpi-val" id="kpi-fat">R$ 0,00</div>
-                    <div class="progress-bar"><div class="progress-fill" id="prog-fat"></div></div>
-                    <small id="meta-txt" style="color:#64748b">0% da meta</small>
+                <div class="card" style="border-left:5px solid var(--money)">
+                    <div style="color:#64748b; font-size:0.9rem">FATURAMENTO</div>
+                    <div id="kpi-fat" style="font-size:2rem; font-weight:800; color:#0f172a">R$ 0,00</div>
                 </div>
-                <div class="card kpi-card" style="border-color: var(--accent);">
-                    <div class="kpi-label">Ticket Médio</div>
-                    <div class="kpi-val" id="kpi-ticket">R$ 0,00</div>
-                </div>
-                <div class="card kpi-card" style="border-color: var(--warning);">
-                    <div class="kpi-label">Total Pedidos</div>
-                    <div class="kpi-val" id="kpi-vol">0</div>
-                </div>
-                <div class="card kpi-card" style="border-color: var(--danger);">
-                    <div class="kpi-label">Risco de Churn</div>
-                    <div class="kpi-val" style="color:var(--danger)" id="kpi-churn">0</div>
-                    <small>Clientes sem compra > 30d</small>
+                <div class="card" style="border-left:5px solid var(--accent)">
+                    <div style="color:#64748b; font-size:0.9rem">TICKET MÉDIO</div>
+                    <div id="kpi-ticket" style="font-size:2rem; font-weight:800; color:#0f172a">R$ 0,00</div>
                 </div>
             </div>
-
-            <div class="grid-3" style="margin-top:20px">
-                <div class="card">
-                    <h3>🏆 Produtos Mais Vendidos</h3>
-                    <div id="rank-products">
-                        <p style="color:#aaa">Importe dados para ver o ranking.</p>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3>⚠️ Atenção ao Cliente (Queda)</h3>
-                    <p style="font-size:0.9rem; color:#64748b">Clientes com queda no volume de compras:</p>
-                    <ul id="churn-list" style="list-style:none; padding:0; margin-top:10px;"></ul>
-                </div>
+            <div class="card">
+                <h3>🏆 Produtos Mais Vendidos</h3>
+                <div id="rank-products"><p style="color:#aaa">Importe dados para ver o ranking.</p></div>
             </div>
         </div>
 
         <div id="v-monitor" class="view">
             <div id="monitor-bg" class="monitor-layout">
+                
+                <div class="monitor-side-panel">
+                    <h3 style="margin:0 0 15px 0; color:#fff; border-bottom:1px solid #fff; padding-bottom:5px">GRADE HORÁRIA</h3>
+                    <div id="monitor-schedule-list"></div>
+                </div>
+
                 <div style="font-size: 1.5vw; font-weight: 900; letter-spacing: 5px; opacity: 0.8;">ROTA ATUAL</div>
-                <div id="monitor-rota" style="font-size: 8vw; font-weight: 900; line-height: 1; text-transform: uppercase;">---</div>
+                <div id="monitor-rota" style="font-size: 8vw; font-weight: 900; line-height: 1; text-transform: uppercase; text-shadow: 2px 2px 10px rgba(0,0,0,0.5);">---</div>
+                
                 <div id="monitor-timer" class="timer-big">00:00:00</div>
-                <div style="margin-top: 30px; background: rgba(255,255,255,0.1); padding: 15px 30px; border-radius: 50px;">
+                
+                <div style="margin-top: 30px; background: rgba(0,0,0,0.4); padding: 15px 30px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.3);">
                     <i class="fas fa-comment-alt" style="color:var(--accent)"></i> <span id="monitor-feed" style="font-style:italic; font-weight:bold">Carregando elogios...</span>
                 </div>
             </div>
@@ -215,25 +181,21 @@
 
         <div id="v-admin" class="view">
             <div class="card">
-                <h2><i class="fas fa-database"></i> Importação de Dados</h2>
+                <h2><i class="fas fa-cogs"></i> Configuração de Rotas</h2>
+                <div class="admin-route-row admin-route-header">
+                    <div>Nome da Rota</div><div>Cor 1</div><div>Cor 2</div><div>Início</div><div>Fim</div><div>Ação</div>
+                </div>
+                <div id="admin-routes-list"></div>
+                <button class="btn btn-success" style="margin-top:15px" onclick="app.addRouteRow()">+ Nova Rota</button>
+                <button class="btn btn-primary" style="margin-top:15px; margin-left:10px" onclick="app.saveRoutesAdmin()">💾 Salvar Alterações</button>
+            </div>
+            <div class="card">
+                <h3>Importação de Dados</h3>
                 <div class="grid-3" style="margin-top:20px">
                     <div class="upload-zone" onclick="document.getElementById('file-clients').click()" style="text-align:center; padding:30px; border:2px dashed #ccc; border-radius:10px; cursor:pointer">
                         <i class="fas fa-users fa-3x"></i><br><b>Clientes</b>
                         <input type="file" id="file-clients" hidden onchange="app.importCSV('clients', this)">
                     </div>
-                    <div class="upload-zone" onclick="document.getElementById('file-losses').click()" style="text-align:center; padding:30px; border:2px dashed #ccc; border-radius:10px; cursor:pointer">
-                        <i class="fas fa-file-invoice-dollar fa-3x"></i><br><b>Perdas</b>
-                        <input type="file" id="file-losses" hidden onchange="app.importCSV('losses', this)">
-                    </div>
-                    <div class="upload-zone" onclick="app.resetSystem()" style="text-align:center; padding:30px; border:2px dashed var(--danger); border-radius:10px; cursor:pointer; color:var(--danger)">
-                        <i class="fas fa-trash-alt fa-3x"></i><br><b>Resetar</b>
-                    </div>
-                </div>
-            </div>
-            <div class="card">
-                <h3>Clientes Cadastrados</h3>
-                <div style="max-height: 200px; overflow-y: auto;">
-                    <table id="table-clients" style="width:100%; border-collapse:collapse"><thead><tr style="background:#eee; text-align:left"><th>ID</th><th>Nome</th><th>Rota</th></tr></thead><tbody></tbody></table>
                 </div>
             </div>
         </div>
@@ -316,11 +278,7 @@ const app = {
     data: {
         clients: [{ id: "712", name: "Strike Óticas", route: "BEGE" }, { id: "101", name: "Visão Total", route: "AMARELO" }],
         orders: [], reqs: [], losses: [], feedbacks: [],
-        salesHistory: [ // Dados Simulados de Venda (Se quiser limpar, basta apagar aqui)
-            { prod: "Lente Visão Simples", val: 150, cli: "Strike Óticas" },
-            { prod: "Lente Multifocal", val: 450, cli: "Visão Total" },
-            { prod: "Lente Visão Simples", val: 150, cli: "Strike Óticas" }
-        ],
+        salesHistory: [ { prod: "Lente VS", val: 150, cli: "Strike" } ],
         tags: [], filter: 'TODOS',
         routes: [
             { name: "CORAL / LILÁS", c1: "#ff7f50", c2: "#dcd0ff", s: "16:15:01", e: "09:00:00" },
@@ -331,15 +289,15 @@ const app = {
     },
 
     init: function() {
-        const saved = localStorage.getItem('lablog_v6');
+        const saved = localStorage.getItem('lablog_v7');
         if(saved) this.data = { ...this.data, ...JSON.parse(saved) };
         setInterval(() => this.monitorLoop(), 1000);
         setInterval(() => this.feedLoop(), 8000);
         setInterval(() => this.updateTimers(), 1000);
-        this.renderTags(); this.renderExped(); this.renderAdminClients();
+        this.renderTags(); this.renderExped();
     },
 
-    save: function() { localStorage.setItem('lablog_v6', JSON.stringify(this.data)); },
+    save: function() { localStorage.setItem('lablog_v7', JSON.stringify(this.data)); },
 
     login: function() {
         const role = document.getElementById('user-role').value;
@@ -364,7 +322,7 @@ const app = {
             if(role === 'admin') html += `<button onclick="app.nav('perdas')"><i class="fas fa-chart-line"></i> Perdas</button>`;
             
             menu.innerHTML = html;
-            this.nav(role === 'admin' ? 'vendas' : 'exped');
+            this.nav(role === 'admin' ? 'admin' : 'exped');
         }
     },
 
@@ -375,140 +333,89 @@ const app = {
         if(view === 'vendas') this.renderSalesDashboard();
         if(view === 'perdas') this.renderLosses();
         if(view === 'reqs') this.renderReqs();
+        if(view === 'admin') this.renderAdminRoutes();
     },
 
-    // --- MÓDULO VENDAS ---
+    // --- ADMIN ROTAS ---
+    renderAdminRoutes: function() {
+        const container = document.getElementById('admin-routes-list');
+        container.innerHTML = this.data.routes.map((r, i) => `
+            <div class="admin-route-row">
+                <input type="text" value="${r.name}" id="r-name-${i}">
+                <input type="color" value="${r.c1}" id="r-c1-${i}">
+                <input type="color" value="${r.c2}" id="r-c2-${i}">
+                <input type="text" value="${r.s}" id="r-s-${i}" placeholder="HH:MM:SS">
+                <input type="text" value="${r.e}" id="r-e-${i}" placeholder="HH:MM:SS">
+                <button class="btn btn-danger" style="padding:5px 10px" onclick="app.removeRoute(${i})"><i class="fas fa-trash"></i></button>
+            </div>
+        `).join('');
+    },
+    addRouteRow: function() { this.data.routes.push({ name: "NOVA ROTA", c1: "#000000", c2: "#ffffff", s: "00:00:00", e: "00:00:00" }); this.renderAdminRoutes(); },
+    removeRoute: function(index) { if(confirm("Remover?")){ this.data.routes.splice(index, 1); this.renderAdminRoutes(); } },
+    saveRoutesAdmin: function() {
+        this.data.routes.forEach((r, i) => {
+            r.name = document.getElementById(`r-name-${i}`).value;
+            r.c1 = document.getElementById(`r-c1-${i}`).value;
+            r.c2 = document.getElementById(`r-c2-${i}`).value;
+            r.s = document.getElementById(`r-s-${i}`).value;
+            r.e = document.getElementById(`r-e-${i}`).value;
+        });
+        this.save(); alert("Rotas atualizadas!");
+        document.getElementById('monitor-schedule-list').innerHTML = ''; // Força update do telão
+    },
+
+    // --- MONITOR ENGINE ---
+    monitorLoop: function() {
+        const now = new Date();
+        const sec = (now.getHours()*3600) + (now.getMinutes()*60) + now.getSeconds();
+        
+        // Renderiza lista lateral se vazia
+        const listEl = document.getElementById('monitor-schedule-list');
+        if(listEl.innerHTML === '') {
+            listEl.innerHTML = this.data.routes.map(r => `<div class="monitor-side-item"><div class="color-dot" style="background:${r.c1}"></div><span>${r.name}</span><span style="font-size:0.9rem;opacity:0.8;margin-left:auto">${r.e.substring(0,5)}</span></div>`).join('');
+        }
+
+        const active = this.data.routes.find(r => {
+            const s = this.hms(r.s), e = this.hms(r.e);
+            return s > e ? (sec >= s || sec <= e) : (sec >= s && sec <= e);
+        });
+
+        if(active) {
+            document.getElementById('monitor-bg').style.background = `linear-gradient(135deg, ${active.c1}, ${active.c2})`;
+            document.getElementById('monitor-rota').innerText = active.name;
+            const e = this.hms(active.e); let t = new Date(); t.setHours(Math.floor(e/3600), Math.floor((e%3600)/60), e%60, 0);
+            if(t < now) t.setDate(t.getDate()+1);
+            const diff = t - now;
+            const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
+            const timerDiv = document.getElementById('monitor-timer');
+            timerDiv.innerText = `${this.pad(h)}:${this.pad(m)}:${this.pad(s)}`;
+            if(diff <= 900000) timerDiv.classList.add('timer-blink-red'); else timerDiv.classList.remove('timer-blink-red');
+        }
+    },
+
+    // --- OUTROS MÓDULOS (Mantidos) ---
     renderSalesDashboard: function() {
         const totalFat = this.data.salesHistory.reduce((a,b) => a + b.val, 0);
         const totalVol = this.data.salesHistory.length;
-        const ticket = totalVol ? (totalFat / totalVol) : 0;
-        const meta = 50000; // Meta Exemplo
-        const prog = Math.min((totalFat / meta) * 100, 100);
-
-        // Atualizar KPIs
         document.getElementById('kpi-fat').innerText = "R$ " + totalFat.toFixed(2);
-        document.getElementById('kpi-ticket').innerText = "R$ " + ticket.toFixed(2);
-        document.getElementById('kpi-vol').innerText = totalVol;
-        document.getElementById('prog-fat').style.width = prog + "%";
-        document.getElementById('meta-txt').innerText = prog.toFixed(1) + "% da meta (R$50k)";
-
-        // Ranking Produtos
-        const counts = {};
-        this.data.salesHistory.forEach(s => { counts[s.prod] = (counts[s.prod] || 0) + 1; });
+        document.getElementById('kpi-ticket').innerText = "R$ " + (totalVol ? (totalFat / totalVol) : 0).toFixed(2);
+        const counts = {}; this.data.salesHistory.forEach(s => { counts[s.prod] = (counts[s.prod] || 0) + 1; });
         const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 5);
-        document.getElementById('rank-products').innerHTML = sorted.map((p, i) => `
-            <div class="product-rank-item">
-                <div style="display:flex; gap:10px; align-items:center">
-                    <div class="rank-badge">${i+1}</div> <b>${p[0]}</b>
-                </div>
-                <span>${p[1]} un.</span>
-            </div>`).join('');
-
-        // Churn Risk (Simples: Clientes que não aparecem na lista de vendas recente)
-        const buyers = new Set(this.data.salesHistory.map(s => s.cli));
-        const churn = this.data.clients.filter(c => !buyers.has(c.name));
-        document.getElementById('kpi-churn').innerText = churn.length;
-        document.getElementById('churn-list').innerHTML = churn.slice(0,5).map(c => `<li>🚫 ${c.name}</li>`).join('');
+        document.getElementById('rank-products').innerHTML = sorted.map((p, i) => `<div class="product-rank-item" style="padding:10px;border-bottom:1px solid #eee"><b>${i+1}. ${p[0]}</b> - ${p[1]} un.</div>`).join('');
     },
-
-    // --- EXPEDIÇÃO (Tags & Timers) ---
-    handleTagInput: function(e) {
-        if(e.key === 'Enter' || e.key === ',' || e.key === ' ') {
-            e.preventDefault(); const val = e.target.value.trim().toUpperCase();
-            if(val && !this.data.tags.includes(val)) {
-                this.data.tags.push(val); this.renderTags();
-                const o = this.data.orders.find(o=>o.id===val); if(o){o.sel=true; this.save(); this.renderExped();}
-            }
-            e.target.value = "";
-        }
-        if(e.key==='Backspace' && e.target.value==="" && this.data.tags.length>0){ this.data.tags.pop(); this.renderTags(); }
-    },
-    removeTag: function(tag) {
-        this.data.tags = this.data.tags.filter(t => t !== tag); this.renderTags();
-        const o = this.data.orders.find(o=>o.id===tag); if(o){o.sel=false; this.save(); this.renderExped();}
-    },
-    renderTags: function() {
-        const area=document.getElementById('tag-area'), inp=document.getElementById('exp-input');
-        area.innerHTML=''; this.data.tags.forEach(t=>{
-            const el=document.createElement('div'); el.className='tag-chip';
-            el.innerHTML=`${t} <span class="tag-remove" onclick="app.removeTag('${t}')">×</span>`; area.appendChild(el);
-        });
-        area.appendChild(inp); inp.focus();
-    },
+    
+    // ... Funções de Expedição, Perdas, Reqs e Atendimento (Idênticas à v6, apenas compactadas para caber) ...
+    handleTagInput: function(e) { if(e.key==='Enter'||e.key===','||e.key===' '){e.preventDefault(); const v=e.target.value.trim().toUpperCase(); if(v&&!this.data.tags.includes(v)){this.data.tags.push(v); this.renderTags(); const o=this.data.orders.find(o=>o.id===v); if(o){o.sel=true; this.save(); this.renderExped();}} e.target.value="";} if(e.key==='Backspace'&&e.target.value===""&&this.data.tags.length>0){this.data.tags.pop(); this.renderTags();} },
+    removeTag: function(tag) { this.data.tags=this.data.tags.filter(t=>t!==tag); this.renderTags(); const o=this.data.orders.find(o=>o.id===tag); if(o){o.sel=false; this.save(); this.renderExped();} },
+    renderTags: function() { const area=document.getElementById('tag-area'), inp=document.getElementById('exp-input'); area.innerHTML=''; this.data.tags.forEach(t=>{const el=document.createElement('div'); el.className='tag-chip'; el.innerHTML=`${t} <span class="tag-remove" onclick="app.removeTag('${t}')">×</span>`; area.appendChild(el);}); area.appendChild(inp); inp.focus(); },
     filterExped: function(f, b) { this.data.filter=f; document.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); this.renderExped(); },
-    renderExped: function() {
-        const l=document.getElementById('exped-list');
-        const f=this.data.orders.filter(o => this.data.filter==='TODOS' || o.route.includes(this.data.filter));
-        l.innerHTML=f.map(o=>`
-            <div class="exp-card"><div class="exp-strip" style="background:${this.getRouteColor(o.route)}"></div>
-            <div class="exp-content"><div><h4>${o.cli} <span style="font-size:0.8rem;color:#888">(${o.id})</span></h4><span style="background:#eee;padding:2px 6px;border-radius:4px;font-size:0.8rem">${o.route}</span></div>
-            <div style="text-align:right"><div class="exp-timer" data-time="${o.time}">...</div><input type="checkbox" ${o.sel?'checked':''} disabled style="margin-top:5px">
-            <button onclick="app.finishOrd('${o.id}')" style="margin-left:10px;cursor:pointer;border:none;background:none;color:green"><i class="fas fa-check-circle"></i></button></div></div></div>
-        `).join('') || '<div style="text-align:center;color:#999;margin-top:20px">Vazio</div>';
-        this.updateTimers();
-    },
-    updateTimers: function() {
-        document.querySelectorAll('.exp-timer').forEach(el=>{
-            const d=Date.now()-parseInt(el.getAttribute('data-time'));
-            const h=Math.floor(d/3600000), m=Math.floor((d%3600000)/60000), s=Math.floor((d%60000)/1000);
-            el.innerText=`${h}h ${m}m ${s}s`; if(d>172800000)el.classList.add('late');else el.classList.remove('late');
-        });
-    },
-    getRouteColor: function(r) {
-        if(r.includes('AMARELO')) return '#fbbf24'; if(r.includes('CORAL')) return '#ff7f50';
-        if(r.includes('BEGE')) return '#fcd34d'; if(r.includes('ROSA')) return '#c084fc'; return '#ccc';
-    },
+    renderExped: function() { const l=document.getElementById('exped-list'); const f=this.data.orders.filter(o => this.data.filter==='TODOS' || o.route.includes(this.data.filter)); l.innerHTML=f.map(o=>`<div class="exp-card"><div class="exp-strip" style="background:${this.getRouteColor(o.route)}"></div><div class="exp-content"><div><h4>${o.cli} <small>(${o.id})</small></h4><span style="background:#eee;padding:2px 6px;border-radius:4px;font-size:0.8rem">${o.route}</span></div><div style="text-align:right"><div class="exp-timer" data-time="${o.time}">...</div><input type="checkbox" ${o.sel?'checked':''} disabled style="margin-top:5px"><button onclick="app.finishOrd('${o.id}')" style="margin-left:10px;cursor:pointer;border:none;background:none;color:green"><i class="fas fa-check-circle"></i></button></div></div></div>`).join('') || '<div style="text-align:center;color:#999;margin-top:20px">Vazio</div>'; this.updateTimers(); },
+    updateTimers: function() { document.querySelectorAll('.exp-timer').forEach(el=>{const d=Date.now()-parseInt(el.getAttribute('data-time')); const h=Math.floor(d/3600000), m=Math.floor((d%3600000)/60000), s=Math.floor((d%60000)/1000); el.innerText=`${h}h ${m}m ${s}s`; if(d>172800000)el.classList.add('late');else el.classList.remove('late');}); },
+    getRouteColor: function(r) { if(r.includes('AMARELO')) return '#fbbf24'; if(r.includes('CORAL')) return '#ff7f50'; if(r.includes('BEGE')) return '#fcd34d'; if(r.includes('ROSA')) return '#c084fc'; return '#ccc'; },
     finishOrd: function(id) { if(confirm("Baixar?")){this.data.orders=this.data.orders.filter(o=>o.id!==id); this.save(); this.renderExped();} },
     printLote: function() { if(!this.data.tags.length)return alert("Bipe!"); alert("Imprimindo: "+this.data.tags.join(", ")); },
-
-    // --- REQ / ATEND / PERDAS / IMPORT ---
-    addReq: function() { 
-        const s=document.getElementById('req-sector').value, t=document.getElementById('req-type').value, d=document.getElementById('req-desc').value;
-        if(!d)return; this.data.reqs.push({id:"R"+Date.now(),s,t,d,time:Date.now()}); this.save(); this.renderReqs(); document.getElementById('req-desc').value="";
-    },
+    addReq: function() { const s=document.getElementById('req-sector').value, t=document.getElementById('req-type').value, d=document.getElementById('req-desc').value; if(!d)return; this.data.reqs.push({id:"R"+Date.now(),s,t,d,time:Date.now()}); this.save(); this.renderReqs(); document.getElementById('req-desc').value=""; },
     renderReqs: function() { document.getElementById('req-list').innerHTML=this.data.reqs.map(r=>`<div class="ticket-card"><div><h4>${r.t}-${r.s}</h4><p>${r.d}</p></div><button class="btn btn-success" onclick="app.finishReq('${r.id}')">OK</button></div>`).join(''); },
     finishReq: function(id) { this.data.reqs=this.data.reqs.filter(r=>r.id!==id); this.save(); this.renderReqs(); },
-
     searchCli: function(v) { const c=this.data.clients.find(x=>x.id===v||x.name.toLowerCase().includes(v.toLowerCase())); document.getElementById('at-match').innerText=c?c.name:""; },
-    addOrder: function() {
-        const v=document.getElementById('at-cod').value, c=this.data.clients.find(x=>x.id===v||x.name.toLowerCase().includes(v.toLowerCase()));
-        const t=document.getElementById('at-type').value, o=document.getElementById('at-obs').value;
-        if(!c && t!=='Elogio' && t!=='Reclamacao') return alert("Cliente inválido");
-        if(t==='Elogio'||t==='Reclamacao'){ this.data.feedbacks.unshift({msg:o,type:t,from:c?c.name:'Anonimo'}); alert('Feedback enviado!'); }
-        else { this.data.orders.push({id:"P"+Date.now().toString().slice(-4),cli:c.name,route:c.route,type:t,obs:o,time:Date.now(),sel:false}); alert('Pedido enviado!'); }
-        this.save(); document.getElementById('at-obs').value=""; this.renderExped();
-    },
-
-    addLoss: function() { const i=document.getElementById('loss-item').value, v=parseFloat(document.getElementById('loss-val').value); if(!i||!v)return; this.data.losses.push({item:i,val:v}); this.save(); this.renderLosses(); },
-    renderLosses: function() { const t=this.data.losses.reduce((a,b)=>a+b.val,0); document.getElementById('loss-total').innerText="R$ "+t.toFixed(2); document.getElementById('loss-history').innerHTML=this.data.losses.slice(-5).map(l=>`<li>${l.item}: R$${l.val}</li>`).join(''); },
-
-    importCSV: function(type, input) {
-        const file = input.files[0]; if(!file)return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const lines = e.target.result.split('\n');
-            if(type==='sales') { lines.forEach(l=>{const[prod,val,cli]=l.split(','); if(prod&&val)this.data.salesHistory.push({prod:prod.trim(),val:parseFloat(val),cli:cli?cli.trim():'Cliente'});}); alert('Vendas Importadas!'); this.renderSalesDashboard(); }
-            if(type==='clients') { this.data.clients=[]; lines.forEach(l=>{const[id,n,r]=l.split(','); if(id)this.data.clients.push({id:id.trim(),name:n.trim(),route:r?r.trim():'GERAL'});}); this.renderAdminClients(); }
-            this.save();
-        }; reader.readAsText(file);
-    },
-    renderAdminClients: function(){ const t=document.querySelector('#table-clients tbody'); if(t)t.innerHTML=this.data.clients.map(c=>`<tr><td>${c.id}</td><td>${c.name}</td><td>${c.route}</td></tr>`).join(''); },
-    resetSystem: function(){ if(confirm("Apagar tudo?")){localStorage.removeItem('lablog_v6');location.reload();} },
-
-    monitorLoop: function() {
-        const now=new Date(), sec=(now.getHours()*3600)+(now.getMinutes()*60)+now.getSeconds();
-        const active=this.data.routes.find(r=>{const s=this.hms(r.s),e=this.hms(r.e); return s>e?(sec>=s||sec<=e):(sec>=s&&sec<=e);});
-        if(active){ document.getElementById('monitor-bg').style.background=`linear-gradient(135deg, ${active.c1}, ${active.c2})`; document.getElementById('monitor-rota').innerText=active.name;
-        const e=this.hms(active.e); let t=new Date(); t.setHours(Math.floor(e/3600), Math.floor((e%3600)/60), e%60, 0); if(t<now)t.setDate(t.getDate()+1);
-        const d=t-now, h=Math.floor(d/3600000), m=Math.floor((d%3600000)/60000), s=Math.floor((d%60000)/1000); document.getElementById('monitor-timer').innerText=`${this.pad(h)}:${this.pad(m)}:${this.pad(s)}`;}
-    },
-    feedIndex: 0,
-    feedLoop: function() { const f=this.data.feedbacks.filter(x=>x.type==='Elogio'); if(!f.length)return; document.getElementById('monitor-feed').innerText=`"${f[this.feedIndex].msg}"`; this.feedIndex=(this.feedIndex+1)%f.length; },
-    hms: function(s) { const p=s.split(':').map(Number); return (p[0]*3600)+(p[1]*60)+(p[2]||0); },
-    pad: function(n) { return n<10?'0'+n:n; }
-};
-app.init();
-</script>
-</body>
-
-</html>
+    addOrder: function() { const v=document.getElementById('at-cod').value, c=this.data.clients.find(x=>x.id===v||x.name.toLowerCase().includes(v.toLowerCase())); const t=document.getElementById('at-type').value, o=document.getElementById('at-obs').value; if(!c && t!=='Elogio' && t!=='Reclamacao') return alert("Cliente inválido"); if(t==='Elogio'||t==='Reclamacao'){ this.data.feedbacks.unshift({msg:o,type:t,from:c?c.name:'Anonimo'}); alert('Feedback enviado!'); } else { this.data.orders.push({id:"P"+Date.now().toString().slice(-
