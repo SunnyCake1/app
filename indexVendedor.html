@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LabLog v6.0 - Suite Completa</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #0f172a; --secondary: #334155; --accent: #38bdf8;
+            --bg: #f8fafc; --card-bg: #ffffff;
+            --coral: #ff7f50; --amarelo: #fbbf24; --lilas: #c084fc; --bege: #fcd34d;
+            --success: #22c55e; --danger: #ef4444; --warning: #f59e0b; --money: #10b981;
+        }
+
+        body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: var(--bg); height: 100vh; display: flex; overflow: hidden; color: #1e293b; }
+        
+        /* --- SIDEBAR --- */
+        aside { 
+            width: 260px; background: var(--primary); color: white; display: flex; flex-direction: column; 
+            transition: all 0.3s ease; box-shadow: 4px 0 15px rgba(0,0,0,0.1); z-index: 10;
+        }
+        aside.hidden { margin-left: -260px; }
+        .brand { padding: 30px; font-size: 1.5rem; font-weight: 800; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .brand span { color: var(--accent); }
+        nav { padding: 20px 10px; flex: 1; overflow-y: auto; }
+        nav button { 
+            width: 100%; padding: 14px 18px; margin-bottom: 8px; background: transparent; border: none; 
+            color: #94a3b8; text-align: left; cursor: pointer; border-radius: 8px; font-weight: 600; 
+            display: flex; align-items: center; gap: 12px; transition: 0.2s; 
+        }
+        nav button:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        nav button.active { background: var(--accent); color: #0f172a; box-shadow: 0 0 15px rgba(56, 189, 248, 0.3); }
+
+        /* --- MAIN --- */
+        main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        header { background: #fff; padding: 15px 30px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .view { display: none; padding: 30px; overflow-y: auto; height: 100%; box-sizing: border-box; }
+        .view.active { display: block; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- UI ELEMENTS --- */
+        .card { background: var(--card-bg); border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 24px; border: 1px solid #e2e8f0; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        
+        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
+        input:focus { border-color: var(--accent); outline: none; ring: 2px solid var(--accent); }
+        
+        .btn { padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; justify-content: center; }
+        .btn:hover { filter: brightness(110%); transform: translateY(-1px); }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-accent { background: var(--accent); color: #0f172a; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-money { background: var(--money); color: white; }
+
+        /* --- VENDAS DASHBOARD --- */
+        .kpi-card { border-left: 5px solid var(--money); }
+        .kpi-val { font-size: 2rem; font-weight: 800; color: #0f172a; }
+        .kpi-label { font-size: 0.9rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+        .progress-bar { height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; margin-top: 10px; }
+        .progress-fill { height: 100%; background: var(--money); width: 0%; transition: 1s; }
+        
+        .product-rank-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #f1f5f9; }
+        .product-rank-item:last-child { border-bottom: none; }
+        .rank-badge { background: var(--primary); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; }
+
+        /* --- EXPEDIÇÃO (Balloons & Cards) --- */
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+        .filter-btn { padding: 8px 16px; border: 1px solid #cbd5e1; background: #fff; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 0.9rem; white-space: nowrap; transition: 0.2s; }
+        .filter-btn:hover { background: #f8fafc; border-color: var(--accent); }
+        .filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+        .tag-container { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; border: 2px dashed #cbd5e1; border-radius: 8px; min-height: 50px; background: #f8fafc; align-items: center; margin-bottom: 15px; }
+        .tag-chip { background: #0f172a; color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; font-weight: 600; }
+        .tag-remove { cursor: pointer; color: var(--accent); font-weight: bold; }
+
+        .exp-card { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 15px; display: flex; overflow: hidden; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .exp-strip { width: 8px; }
+        .exp-content { padding: 15px; flex: 1; display: flex; justify-content: space-between; align-items: center; }
+        .exp-timer { font-family: monospace; font-size: 0.9rem; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; }
+        .exp-timer.late { color: #ef4444; background: #fee2e2; border: 1px solid #ef4444; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.6; } }
+
+        /* --- MONITOR TELÃO --- */
+        #v-monitor { padding: 0 !important; background: #000; color: #fff; }
+        .monitor-layout { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: background 1s; }
+        .timer-big { font-size: 6vw; font-family: 'Courier New', monospace; font-weight: 900; background: rgba(0,0,0,0.3); padding: 0 40px; border-radius: 20px; backdrop-filter: blur(5px); border: 2px solid rgba(255,255,255,0.2); }
+
+        /* Login */
+        #login-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: white; padding: 40px; border-radius: 16px; width: 350px; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div id="login-overlay">
+        <div class="login-box">
+            <h1 style="color:var(--primary)">LabLog <span style="color:var(--accent)">6.0</span></h1>
+            <p style="color:#64748b; margin-bottom:20px">Sistema Integrado</p>
+            <select id="user-role">
+                <option value="admin">👑 ADMIN / GERÊNCIA</option>
+                <option value="vendas">💼 VENDEDOR / COMERCIAL</option>
+                <option value="atend">☎️ ATENDIMENTO</option>
+                <option value="exped">📦 EXPEDIÇÃO</option>
+                <option value="reqs">🔧 SETORES (REQ. INTERNA)</option>
+                <option value="telao">📺 MONITOR (TELÃO)</option>
+            </select>
+            <button class="btn btn-primary" style="width:100%; margin-top:15px" onclick="app.login()">ACESSAR</button>
+        </div>
+    </div>
+
+    <aside id="sidebar">
+        <div class="brand"><i class="fas fa-atom"></i> LAB<span>LOG</span></div>
+        <nav id="menu-nav"></nav>
+    </aside>
+
+    <main>
+        <header id="top-bar">
+            <h3 id="page-title">Dashboard</h3>
+            <div style="font-size:0.9rem; color:#64748b">
+                <i class="far fa-user-circle"></i> <span id="user-display">Usuário</span>
+            </div>
+        </header>
+
+        <div id="v-vendas" class="view">
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px">
+                <h2><i class="fas fa-chart-bar"></i> Gestão Comercial</h2>
+                <div class="upload-zone" onclick="document.getElementById('file-sales').click()" style="padding: 10px 20px; border: 1px dashed var(--primary); border-radius:8px; cursor:pointer;">
+                    <i class="fas fa-upload"></i> Importar CSV Vendas
+                    <input type="file" id="file-sales" hidden onchange="app.importCSV('sales', this)">
+                </div>
+            </div>
+
+            <div class="grid-4">
+                <div class="card kpi-card">
+                    <div class="kpi-label">Faturamento (Mês)</div>
+                    <div class="kpi-val" id="kpi-fat">R$ 0,00</div>
+                    <div class="progress-bar"><div class="progress-fill" id="prog-fat"></div></div>
+                    <small id="meta-txt" style="color:#64748b">0% da meta</small>
+                </div>
+                <div class="card kpi-card" style="border-color: var(--accent);">
+                    <div class="kpi-label">Ticket Médio</div>
+                    <div class="kpi-val" id="kpi-ticket">R$ 0,00</div>
+                </div>
+                <div class="card kpi-card" style="border-color: var(--warning);">
+                    <div class="kpi-label">Total Pedidos</div>
+                    <div class="kpi-val" id="kpi-vol">0</div>
+                </div>
+                <div class="card kpi-card" style="border-color: var(--danger);">
+                    <div class="kpi-label">Risco de Churn</div>
+                    <div class="kpi-val" style="color:var(--danger)" id="kpi-churn">0</div>
+                    <small>Clientes sem compra > 30d</small>
+                </div>
+            </div>
+
+            <div class="grid-3" style="margin-top:20px">
+                <div class="card">
+                    <h3>🏆 Produtos Mais Vendidos</h3>
+                    <div id="rank-products">
+                        <p style="color:#aaa">Importe dados para ver o ranking.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>⚠️ Atenção ao Cliente (Queda)</h3>
+                    <p style="font-size:0.9rem; color:#64748b">Clientes com queda no volume de compras:</p>
+                    <ul id="churn-list" style="list-style:none; padding:0; margin-top:10px;"></ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="v-monitor" class="view">
+            <div id="monitor-bg" class="monitor-layout">
+                <div style="font-size: 1.5vw; font-weight: 900; letter-spacing: 5px; opacity: 0.8;">ROTA ATUAL</div>
+                <div id="monitor-rota" style="font-size: 8vw; font-weight: 900; line-height: 1; text-transform: uppercase;">---</div>
+                <div id="monitor-timer" class="timer-big">00:00:00</div>
+                <div style="margin-top: 30px; background: rgba(255,255,255,0.1); padding: 15px 30px; border-radius: 50px;">
+                    <i class="fas fa-comment-alt" style="color:var(--accent)"></i> <span id="monitor-feed" style="font-style:italic; font-weight:bold">Carregando elogios...</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="v-admin" class="view">
+            <div class="card">
+                <h2><i class="fas fa-database"></i> Importação de Dados</h2>
+                <div class="grid-3" style="margin-top:20px">
+                    <div class="upload-zone" onclick="document.getElementById('file-clients').click()" style="text-align:center; padding:30px; border:2px dashed #ccc; border-radius:10px; cursor:pointer">
+                        <i class="fas fa-users fa-3x"></i><br><b>Clientes</b>
+                        <input type="file" id="file-clients" hidden onchange="app.importCSV('clients', this)">
+                    </div>
+                    <div class="upload-zone" onclick="document.getElementById('file-losses').click()" style="text-align:center; padding:30px; border:2px dashed #ccc; border-radius:10px; cursor:pointer">
+                        <i class="fas fa-file-invoice-dollar fa-3x"></i><br><b>Perdas</b>
+                        <input type="file" id="file-losses" hidden onchange="app.importCSV('losses', this)">
+                    </div>
+                    <div class="upload-zone" onclick="app.resetSystem()" style="text-align:center; padding:30px; border:2px dashed var(--danger); border-radius:10px; cursor:pointer; color:var(--danger)">
+                        <i class="fas fa-trash-alt fa-3x"></i><br><b>Resetar</b>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Clientes Cadastrados</h3>
+                <div style="max-height: 200px; overflow-y: auto;">
+                    <table id="table-clients" style="width:100%; border-collapse:collapse"><thead><tr style="background:#eee; text-align:left"><th>ID</th><th>Nome</th><th>Rota</th></tr></thead><tbody></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <div id="v-reqs" class="view">
+            <div class="card">
+                <h2><i class="fas fa-clipboard-list"></i> Requisição Interna</h2>
+                <div class="grid-3">
+                    <select id="req-sector"><option>Montagem</option><option>Surfaçagem</option><option>Adm</option></select>
+                    <select id="req-type"><option>RH (Pessoal)</option><option>Insumos</option><option>Manutenção</option></select>
+                    <select id="req-urgency"><option>Normal</option><option>Urgente</option></select>
+                </div>
+                <textarea id="req-desc" placeholder="Descreva sua necessidade..."></textarea>
+                <button class="btn btn-primary" onclick="app.addReq()">ABRIR CHAMADO</button>
+            </div>
+            <h3>Meus Chamados</h3>
+            <div id="req-list"></div>
+        </div>
+
+        <div id="v-atend" class="view">
+            <div class="card">
+                <h2><i class="fas fa-headset"></i> Nova Solicitação</h2>
+                <div class="grid-3">
+                    <div>
+                        <label>Cliente:</label>
+                        <input type="text" id="at-cod" placeholder="Buscar..." oninput="app.searchCli(this.value)">
+                        <small id="at-match" style="color:var(--success); font-weight:bold"></small>
+                    </div>
+                    <div>
+                        <label>Tipo:</label>
+                        <select id="at-type"><option>Coleta</option><option>Elogio</option><option>Reclamacao</option></select>
+                    </div>
+                </div>
+                <textarea id="at-obs" placeholder="Detalhes..."></textarea>
+                <button class="btn btn-accent" style="width:100%" onclick="app.addOrder()">ENVIAR</button>
+            </div>
+        </div>
+
+        <div id="v-exped" class="view">
+            <div class="filter-bar">
+                <button class="filter-btn active" onclick="app.filterExped('TODOS', this)">TODOS</button>
+                <button class="filter-btn" onclick="app.filterExped('AMARELO', this)">🟡 AMARELO</button>
+                <button class="filter-btn" onclick="app.filterExped('CORAL', this)">🟠 CORAL</button>
+                <button class="filter-btn" onclick="app.filterExped('BEGE', this)">🟤 BEGE</button>
+                <button class="filter-btn" onclick="app.filterExped('ROSA', this)">🟣 ROSA</button>
+            </div>
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
+                    <h3><i class="fas fa-barcode"></i> Montagem de Lote</h3>
+                    <button class="btn btn-success" onclick="app.printLote()"><i class="fas fa-print"></i> Imprimir Lote</button>
+                </div>
+                <div class="tag-container" id="tag-area" onclick="document.getElementById('exp-input').focus()">
+                    <input type="text" id="exp-input" placeholder="Bipe o ID e Enter..." style="border:none; background:transparent; outline:none; flex:1; min-width:150px;" onkeydown="app.handleTagInput(event)">
+                </div>
+            </div>
+            <h3>Pedidos Pendentes</h3>
+            <div id="exped-list"></div>
+        </div>
+
+        <div id="v-perdas" class="view">
+            <div class="card">
+                <h2><i class="fas fa-chart-pie"></i> Finanças e Perdas</h2>
+                <div class="grid-3">
+                    <input type="text" id="loss-item" placeholder="Item">
+                    <select id="loss-reason"><option>Quebra</option><option>Erro Humano</option></select>
+                    <input type="number" id="loss-val" placeholder="Valor R$">
+                </div>
+                <button class="btn btn-danger" onclick="app.addLoss()">REGISTRAR</button>
+            </div>
+            <div class="card">
+                <h3>Prejuízo Total: <span id="loss-total" style="color:var(--danger)">R$ 0,00</span></h3>
+                <ul id="loss-history"></ul>
+            </div>
+        </div>
+
+    </main>
+
+<script>
+const app = {
+    data: {
+        clients: [{ id: "712", name: "Strike Óticas", route: "BEGE" }, { id: "101", name: "Visão Total", route: "AMARELO" }],
+        orders: [], reqs: [], losses: [], feedbacks: [],
+        salesHistory: [ // Dados Simulados de Venda (Se quiser limpar, basta apagar aqui)
+            { prod: "Lente Visão Simples", val: 150, cli: "Strike Óticas" },
+            { prod: "Lente Multifocal", val: 450, cli: "Visão Total" },
+            { prod: "Lente Visão Simples", val: 150, cli: "Strike Óticas" }
+        ],
+        tags: [], filter: 'TODOS',
+        routes: [
+            { name: "CORAL / LILÁS", c1: "#ff7f50", c2: "#dcd0ff", s: "16:15:01", e: "09:00:00" },
+            { name: "AMARELO", c1: "#fcd34d", c2: "#fcd34d", s: "09:00:01", e: "10:00:00" },
+            { name: "BEGE / LILÁS", c1: "#fcd34d", c2: "#dcd0ff", s: "10:00:01", e: "14:00:00" },
+            { name: "ROSA / AMARELO", c1: "#f472b6", c2: "#fcd34d", s: "14:00:01", e: "16:15:00" }
+        ]
+    },
+
+    init: function() {
+        const saved = localStorage.getItem('lablog_v6');
+        if(saved) this.data = { ...this.data, ...JSON.parse(saved) };
+        setInterval(() => this.monitorLoop(), 1000);
+        setInterval(() => this.feedLoop(), 8000);
+        setInterval(() => this.updateTimers(), 1000);
+        this.renderTags(); this.renderExped(); this.renderAdminClients();
+    },
+
+    save: function() { localStorage.setItem('lablog_v6', JSON.stringify(this.data)); },
+
+    login: function() {
+        const role = document.getElementById('user-role').value;
+        document.getElementById('login-overlay').style.display = 'none';
+        document.getElementById('user-display').innerText = role.toUpperCase();
+        
+        const menu = document.getElementById('menu-nav');
+        const sidebar = document.getElementById('sidebar');
+        const topbar = document.getElementById('top-bar');
+
+        if(role === 'telao') {
+            sidebar.classList.add('hidden'); topbar.style.display = 'none';
+            this.nav('monitor');
+            if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e=>{});
+        } else {
+            let html = `<button onclick="app.nav('monitor')"><i class="fas fa-tv"></i> Telão</button>`;
+            if(role === 'admin' || role === 'vendas') html += `<button onclick="app.nav('vendas')"><i class="fas fa-chart-bar"></i> Vendas</button>`;
+            if(role === 'admin') html += `<button onclick="app.nav('admin')"><i class="fas fa-cogs"></i> Admin</button>`;
+            if(role === 'admin' || role === 'reqs') html += `<button onclick="app.nav('reqs')"><i class="fas fa-clipboard"></i> Requisições</button>`;
+            if(role === 'admin' || role === 'atend') html += `<button onclick="app.nav('atend')"><i class="fas fa-headset"></i> Atendimento</button>`;
+            if(role === 'admin' || role === 'exped') html += `<button onclick="app.nav('exped')"><i class="fas fa-truck"></i> Expedição</button>`;
+            if(role === 'admin') html += `<button onclick="app.nav('perdas')"><i class="fas fa-chart-line"></i> Perdas</button>`;
+            
+            menu.innerHTML = html;
+            this.nav(role === 'admin' ? 'vendas' : 'exped');
+        }
+    },
+
+    nav: function(view) {
+        document.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
+        document.getElementById('v-'+view).classList.add('active');
+        document.getElementById('page-title').innerText = view.toUpperCase();
+        if(view === 'vendas') this.renderSalesDashboard();
+        if(view === 'perdas') this.renderLosses();
+        if(view === 'reqs') this.renderReqs();
+    },
+
+    // --- MÓDULO VENDAS ---
+    renderSalesDashboard: function() {
+        const totalFat = this.data.salesHistory.reduce((a,b) => a + b.val, 0);
+        const totalVol = this.data.salesHistory.length;
+        const ticket = totalVol ? (totalFat / totalVol) : 0;
+        const meta = 50000; // Meta Exemplo
+        const prog = Math.min((totalFat / meta) * 100, 100);
+
+        // Atualizar KPIs
+        document.getElementById('kpi-fat').innerText = "R$ " + totalFat.toFixed(2);
+        document.getElementById('kpi-ticket').innerText = "R$ " + ticket.toFixed(2);
+        document.getElementById('kpi-vol').innerText = totalVol;
+        document.getElementById('prog-fat').style.width = prog + "%";
+        document.getElementById('meta-txt').innerText = prog.toFixed(1) + "% da meta (R$50k)";
+
+        // Ranking Produtos
+        const counts = {};
+        this.data.salesHistory.forEach(s => { counts[s.prod] = (counts[s.prod] || 0) + 1; });
+        const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 5);
+        document.getElementById('rank-products').innerHTML = sorted.map((p, i) => `
+            <div class="product-rank-item">
+                <div style="display:flex; gap:10px; align-items:center">
+                    <div class="rank-badge">${i+1}</div> <b>${p[0]}</b>
+                </div>
+                <span>${p[1]} un.</span>
+            </div>`).join('');
+
+        // Churn Risk (Simples: Clientes que não aparecem na lista de vendas recente)
+        const buyers = new Set(this.data.salesHistory.map(s => s.cli));
+        const churn = this.data.clients.filter(c => !buyers.has(c.name));
+        document.getElementById('kpi-churn').innerText = churn.length;
+        document.getElementById('churn-list').innerHTML = churn.slice(0,5).map(c => `<li>🚫 ${c.name}</li>`).join('');
+    },
+
+    // --- EXPEDIÇÃO (Tags & Timers) ---
+    handleTagInput: function(e) {
+        if(e.key === 'Enter' || e.key === ',' || e.key === ' ') {
+            e.preventDefault(); const val = e.target.value.trim().toUpperCase();
+            if(val && !this.data.tags.includes(val)) {
+                this.data.tags.push(val); this.renderTags();
+                const o = this.data.orders.find(o=>o.id===val); if(o){o.sel=true; this.save(); this.renderExped();}
+            }
+            e.target.value = "";
+        }
+        if(e.key==='Backspace' && e.target.value==="" && this.data.tags.length>0){ this.data.tags.pop(); this.renderTags(); }
+    },
+    removeTag: function(tag) {
+        this.data.tags = this.data.tags.filter(t => t !== tag); this.renderTags();
+        const o = this.data.orders.find(o=>o.id===tag); if(o){o.sel=false; this.save(); this.renderExped();}
+    },
+    renderTags: function() {
+        const area=document.getElementById('tag-area'), inp=document.getElementById('exp-input');
+        area.innerHTML=''; this.data.tags.forEach(t=>{
+            const el=document.createElement('div'); el.className='tag-chip';
+            el.innerHTML=`${t} <span class="tag-remove" onclick="app.removeTag('${t}')">×</span>`; area.appendChild(el);
+        });
+        area.appendChild(inp); inp.focus();
+    },
+    filterExped: function(f, b) { this.data.filter=f; document.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); this.renderExped(); },
+    renderExped: function() {
+        const l=document.getElementById('exped-list');
+        const f=this.data.orders.filter(o => this.data.filter==='TODOS' || o.route.includes(this.data.filter));
+        l.innerHTML=f.map(o=>`
+            <div class="exp-card"><div class="exp-strip" style="background:${this.getRouteColor(o.route)}"></div>
+            <div class="exp-content"><div><h4>${o.cli} <span style="font-size:0.8rem;color:#888">(${o.id})</span></h4><span style="background:#eee;padding:2px 6px;border-radius:4px;font-size:0.8rem">${o.route}</span></div>
+            <div style="text-align:right"><div class="exp-timer" data-time="${o.time}">...</div><input type="checkbox" ${o.sel?'checked':''} disabled style="margin-top:5px">
+            <button onclick="app.finishOrd('${o.id}')" style="margin-left:10px;cursor:pointer;border:none;background:none;color:green"><i class="fas fa-check-circle"></i></button></div></div></div>
+        `).join('') || '<div style="text-align:center;color:#999;margin-top:20px">Vazio</div>';
+        this.updateTimers();
+    },
+    updateTimers: function() {
+        document.querySelectorAll('.exp-timer').forEach(el=>{
+            const d=Date.now()-parseInt(el.getAttribute('data-time'));
+            const h=Math.floor(d/3600000), m=Math.floor((d%3600000)/60000), s=Math.floor((d%60000)/1000);
+            el.innerText=`${h}h ${m}m ${s}s`; if(d>172800000)el.classList.add('late');else el.classList.remove('late');
+        });
+    },
+    getRouteColor: function(r) {
+        if(r.includes('AMARELO')) return '#fbbf24'; if(r.includes('CORAL')) return '#ff7f50';
+        if(r.includes('BEGE')) return '#fcd34d'; if(r.includes('ROSA')) return '#c084fc'; return '#ccc';
+    },
+    finishOrd: function(id) { if(confirm("Baixar?")){this.data.orders=this.data.orders.filter(o=>o.id!==id); this.save(); this.renderExped();} },
+    printLote: function() { if(!this.data.tags.length)return alert("Bipe!"); alert("Imprimindo: "+this.data.tags.join(", ")); },
+
+    // --- REQ / ATEND / PERDAS / IMPORT ---
+    addReq: function() { 
+        const s=document.getElementById('req-sector').value, t=document.getElementById('req-type').value, d=document.getElementById('req-desc').value;
+        if(!d)return; this.data.reqs.push({id:"R"+Date.now(),s,t,d,time:Date.now()}); this.save(); this.renderReqs(); document.getElementById('req-desc').value="";
+    },
+    renderReqs: function() { document.getElementById('req-list').innerHTML=this.data.reqs.map(r=>`<div class="ticket-card"><div><h4>${r.t}-${r.s}</h4><p>${r.d}</p></div><button class="btn btn-success" onclick="app.finishReq('${r.id}')">OK</button></div>`).join(''); },
+    finishReq: function(id) { this.data.reqs=this.data.reqs.filter(r=>r.id!==id); this.save(); this.renderReqs(); },
+
+    searchCli: function(v) { const c=this.data.clients.find(x=>x.id===v||x.name.toLowerCase().includes(v.toLowerCase())); document.getElementById('at-match').innerText=c?c.name:""; },
+    addOrder: function() {
+        const v=document.getElementById('at-cod').value, c=this.data.clients.find(x=>x.id===v||x.name.toLowerCase().includes(v.toLowerCase()));
+        const t=document.getElementById('at-type').value, o=document.getElementById('at-obs').value;
+        if(!c && t!=='Elogio' && t!=='Reclamacao') return alert("Cliente inválido");
+        if(t==='Elogio'||t==='Reclamacao'){ this.data.feedbacks.unshift({msg:o,type:t,from:c?c.name:'Anonimo'}); alert('Feedback enviado!'); }
+        else { this.data.orders.push({id:"P"+Date.now().toString().slice(-4),cli:c.name,route:c.route,type:t,obs:o,time:Date.now(),sel:false}); alert('Pedido enviado!'); }
+        this.save(); document.getElementById('at-obs').value=""; this.renderExped();
+    },
+
+    addLoss: function() { const i=document.getElementById('loss-item').value, v=parseFloat(document.getElementById('loss-val').value); if(!i||!v)return; this.data.losses.push({item:i,val:v}); this.save(); this.renderLosses(); },
+    renderLosses: function() { const t=this.data.losses.reduce((a,b)=>a+b.val,0); document.getElementById('loss-total').innerText="R$ "+t.toFixed(2); document.getElementById('loss-history').innerHTML=this.data.losses.slice(-5).map(l=>`<li>${l.item}: R$${l.val}</li>`).join(''); },
+
+    importCSV: function(type, input) {
+        const file = input.files[0]; if(!file)return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const lines = e.target.result.split('\n');
+            if(type==='sales') { lines.forEach(l=>{const[prod,val,cli]=l.split(','); if(prod&&val)this.data.salesHistory.push({prod:prod.trim(),val:parseFloat(val),cli:cli?cli.trim():'Cliente'});}); alert('Vendas Importadas!'); this.renderSalesDashboard(); }
+            if(type==='clients') { this.data.clients=[]; lines.forEach(l=>{const[id,n,r]=l.split(','); if(id)this.data.clients.push({id:id.trim(),name:n.trim(),route:r?r.trim():'GERAL'});}); this.renderAdminClients(); }
+            this.save();
+        }; reader.readAsText(file);
+    },
+    renderAdminClients: function(){ const t=document.querySelector('#table-clients tbody'); if(t)t.innerHTML=this.data.clients.map(c=>`<tr><td>${c.id}</td><td>${c.name}</td><td>${c.route}</td></tr>`).join(''); },
+    resetSystem: function(){ if(confirm("Apagar tudo?")){localStorage.removeItem('lablog_v6');location.reload();} },
+
+    monitorLoop: function() {
+        const now=new Date(), sec=(now.getHours()*3600)+(now.getMinutes()*60)+now.getSeconds();
+        const active=this.data.routes.find(r=>{const s=this.hms(r.s),e=this.hms(r.e); return s>e?(sec>=s||sec<=e):(sec>=s&&sec<=e);});
+        if(active){ document.getElementById('monitor-bg').style.background=`linear-gradient(135deg, ${active.c1}, ${active.c2})`; document.getElementById('monitor-rota').innerText=active.name;
+        const e=this.hms(active.e); let t=new Date(); t.setHours(Math.floor(e/3600), Math.floor((e%3600)/60), e%60, 0); if(t<now)t.setDate(t.getDate()+1);
+        const d=t-now, h=Math.floor(d/3600000), m=Math.floor((d%3600000)/60000), s=Math.floor((d%60000)/1000); document.getElementById('monitor-timer').innerText=`${this.pad(h)}:${this.pad(m)}:${this.pad(s)}`;}
+    },
+    feedIndex: 0,
+    feedLoop: function() { const f=this.data.feedbacks.filter(x=>x.type==='Elogio'); if(!f.length)return; document.getElementById('monitor-feed').innerText=`"${f[this.feedIndex].msg}"`; this.feedIndex=(this.feedIndex+1)%f.length; },
+    hms: function(s) { const p=s.split(':').map(Number); return (p[0]*3600)+(p[1]*60)+(p[2]||0); },
+    pad: function(n) { return n<10?'0'+n:n; }
+};
+app.init();
+</script>
+</body>
+</html>
