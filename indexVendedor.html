@@ -93,6 +93,35 @@
         /* Login */
         #login-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
         .login-box { background: white; padding: 40px; border-radius: 16px; width: 350px; text-align: center; }
+
+        /* --- NOVO: Painel Lateral do Monitor --- */
+        .monitor-side-panel {
+            position: absolute; top: 30px; right: 30px;
+            background: rgba(0, 0, 0, 0.6); padding: 20px; border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3); text-align: left;
+            backdrop-filter: blur(5px);
+        }
+        .monitor-side-item {
+            color: #fff; font-size: 1.2rem; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 10px; font-weight: bold;
+        }
+        .color-dot { width: 15px; height: 15px; border-radius: 50%; border: 2px solid #fff; }
+
+        /* --- NOVO: Alerta Vermelho Piscante --- */
+        .timer-blink-red {
+            animation: blinkRed 1s infinite;
+            background-color: #ef4444 !important; /* Vermelho */
+            color: #fff !important;
+            border-color: #fff !important;
+        }
+        @keyframes blinkRed { 
+            50% { opacity: 0.3; } 
+        }
+
+        /* --- NOVO: Tabela Editável no Admin --- */
+        .admin-route-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; gap: 5px; margin-bottom: 10px; align-items: center; }
+        .admin-route-row input { margin: 0; padding: 8px; font-size: 0.9rem; }
+        
     </style>
 </head>
 <body>
@@ -481,4 +510,5 @@ const app = {
 app.init();
 </script>
 </body>
+
 </html>
