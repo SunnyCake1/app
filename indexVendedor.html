@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LabLog v7.0 - Sistema Integrado</title>
+    <title>LabLog v7.1 - Final Stable</title>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
@@ -60,7 +60,6 @@
         #v-monitor { padding: 0 !important; background: #000; color: #fff; }
         .monitor-layout { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: background 1s; position: relative; }
         
-        /* Painel Lateral do Monitor */
         .monitor-side-panel {
             position: absolute; top: 30px; right: 30px;
             background: rgba(0, 0, 0, 0.6); padding: 20px; border-radius: 15px;
@@ -73,10 +72,7 @@
         }
         .color-dot { width: 15px; height: 15px; border-radius: 50%; border: 2px solid #fff; }
         
-        /* Timer Gigante */
         .timer-big { font-size: 7vw; font-family: 'Courier New', monospace; font-weight: 900; background: rgba(0,0,0,0.3); padding: 0 40px; border-radius: 20px; backdrop-filter: blur(5px); border: 4px solid rgba(255,255,255,0.2); transition: 0.3s; }
-        
-        /* Alerta Piscante */
         .timer-blink-red {
             animation: blinkRed 1s infinite;
             background-color: #ef4444 !important; color: #fff !important; border-color: #fff !important;
@@ -86,7 +82,6 @@
 
         /* --- ADMIN ROTAS --- */
         .admin-route-row { display: grid; grid-template-columns: 2fr 0.5fr 0.5fr 1fr 1fr 0.5fr; gap: 10px; margin-bottom: 10px; align-items: center; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
-        .admin-route-row input { margin: 0; padding: 8px; font-size: 0.9rem; }
         .admin-route-header { font-weight: bold; font-size: 0.8rem; text-transform: uppercase; color: #64748b; margin-bottom: 5px; }
 
         /* --- EXPEDIÇÃO PRO --- */
@@ -95,10 +90,15 @@
         .filter-btn.active { background: var(--primary); color: #fff; }
         .tag-container { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; border: 2px dashed #cbd5e1; border-radius: 8px; min-height: 50px; background: #f8fafc; align-items: center; margin-bottom: 15px; }
         .tag-chip { background: #0f172a; color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; font-weight: 600; }
-        .tag-remove { cursor: pointer; color: var(--accent); }
+        .tag-remove { cursor: pointer; color: var(--accent); margin-left: 5px; }
         .exp-card { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 15px; display: flex; overflow: hidden; transition: 0.3s; }
         .exp-strip { width: 8px; }
         .exp-content { padding: 15px; flex: 1; display: flex; justify-content: space-between; align-items: center; }
+        .exp-timer { font-family: monospace; font-size: 0.9rem; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; }
+        .exp-timer.late { color: #ef4444; background: #fee2e2; border: 1px solid #ef4444; animation: blink 1s infinite; }
+        
+        /* --- VENDAS --- */
+        .product-rank-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #f1f5f9; }
 
         /* Login */
         #login-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
@@ -109,7 +109,7 @@
 
     <div id="login-overlay">
         <div class="login-box">
-            <h1 style="color:var(--primary)">LabLog <span style="color:var(--accent)">7.0</span></h1>
+            <h1 style="color:var(--primary)">LabLog <span style="color:var(--accent)">7.1</span></h1>
             <p style="color:#64748b; margin-bottom:20px">Sistema Integrado</p>
             <select id="user-role">
                 <option value="admin">👑 ADMIN / GERÊNCIA</option>
@@ -162,17 +162,13 @@
 
         <div id="v-monitor" class="view">
             <div id="monitor-bg" class="monitor-layout">
-                
                 <div class="monitor-side-panel">
                     <h3 style="margin:0 0 15px 0; color:#fff; border-bottom:1px solid #fff; padding-bottom:5px">GRADE HORÁRIA</h3>
                     <div id="monitor-schedule-list"></div>
                 </div>
-
                 <div style="font-size: 1.5vw; font-weight: 900; letter-spacing: 5px; opacity: 0.8;">ROTA ATUAL</div>
                 <div id="monitor-rota" style="font-size: 8vw; font-weight: 900; line-height: 1; text-transform: uppercase; text-shadow: 2px 2px 10px rgba(0,0,0,0.5);">---</div>
-                
                 <div id="monitor-timer" class="timer-big">00:00:00</div>
-                
                 <div style="margin-top: 30px; background: rgba(0,0,0,0.4); padding: 15px 30px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.3);">
                     <i class="fas fa-comment-alt" style="color:var(--accent)"></i> <span id="monitor-feed" style="font-style:italic; font-weight:bold">Carregando elogios...</span>
                 </div>
@@ -291,10 +287,15 @@ const app = {
     init: function() {
         const saved = localStorage.getItem('lablog_v7');
         if(saved) this.data = { ...this.data, ...JSON.parse(saved) };
+        
+        // Iniciar Loops
         setInterval(() => this.monitorLoop(), 1000);
         setInterval(() => this.feedLoop(), 8000);
         setInterval(() => this.updateTimers(), 1000);
-        this.renderTags(); this.renderExped();
+        
+        // Renderizar Inicial
+        this.renderTags(); 
+        this.renderExped();
     },
 
     save: function() { localStorage.setItem('lablog_v7', JSON.stringify(this.data)); },
@@ -361,7 +362,7 @@ const app = {
             r.e = document.getElementById(`r-e-${i}`).value;
         });
         this.save(); alert("Rotas atualizadas!");
-        document.getElementById('monitor-schedule-list').innerHTML = ''; // Força update do telão
+        document.getElementById('monitor-schedule-list').innerHTML = ''; // Force update
     },
 
     // --- MONITOR ENGINE ---
@@ -387,13 +388,16 @@ const app = {
             if(t < now) t.setDate(t.getDate()+1);
             const diff = t - now;
             const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
+            
             const timerDiv = document.getElementById('monitor-timer');
             timerDiv.innerText = `${this.pad(h)}:${this.pad(m)}:${this.pad(s)}`;
+            
+            // Alerta 15 min
             if(diff <= 900000) timerDiv.classList.add('timer-blink-red'); else timerDiv.classList.remove('timer-blink-red');
         }
     },
 
-    // --- OUTROS MÓDULOS (Mantidos) ---
+    // --- EXPEDIÇÃO, VENDAS E OUTROS ---
     renderSalesDashboard: function() {
         const totalFat = this.data.salesHistory.reduce((a,b) => a + b.val, 0);
         const totalVol = this.data.salesHistory.length;
@@ -401,10 +405,9 @@ const app = {
         document.getElementById('kpi-ticket').innerText = "R$ " + (totalVol ? (totalFat / totalVol) : 0).toFixed(2);
         const counts = {}; this.data.salesHistory.forEach(s => { counts[s.prod] = (counts[s.prod] || 0) + 1; });
         const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 5);
-        document.getElementById('rank-products').innerHTML = sorted.map((p, i) => `<div class="product-rank-item" style="padding:10px;border-bottom:1px solid #eee"><b>${i+1}. ${p[0]}</b> - ${p[1]} un.</div>`).join('');
+        document.getElementById('rank-products').innerHTML = sorted.map((p, i) => `<div class="product-rank-item"><b>${i+1}. ${p[0]}</b> - ${p[1]} un.</div>`).join('');
     },
-    
-    // ... Funções de Expedição, Perdas, Reqs e Atendimento (Idênticas à v6, apenas compactadas para caber) ...
+
     handleTagInput: function(e) { if(e.key==='Enter'||e.key===','||e.key===' '){e.preventDefault(); const v=e.target.value.trim().toUpperCase(); if(v&&!this.data.tags.includes(v)){this.data.tags.push(v); this.renderTags(); const o=this.data.orders.find(o=>o.id===v); if(o){o.sel=true; this.save(); this.renderExped();}} e.target.value="";} if(e.key==='Backspace'&&e.target.value===""&&this.data.tags.length>0){this.data.tags.pop(); this.renderTags();} },
     removeTag: function(tag) { this.data.tags=this.data.tags.filter(t=>t!==tag); this.renderTags(); const o=this.data.orders.find(o=>o.id===tag); if(o){o.sel=false; this.save(); this.renderExped();} },
     renderTags: function() { const area=document.getElementById('tag-area'), inp=document.getElementById('exp-input'); area.innerHTML=''; this.data.tags.forEach(t=>{const el=document.createElement('div'); el.className='tag-chip'; el.innerHTML=`${t} <span class="tag-remove" onclick="app.removeTag('${t}')">×</span>`; area.appendChild(el);}); area.appendChild(inp); inp.focus(); },
@@ -418,4 +421,20 @@ const app = {
     renderReqs: function() { document.getElementById('req-list').innerHTML=this.data.reqs.map(r=>`<div class="ticket-card"><div><h4>${r.t}-${r.s}</h4><p>${r.d}</p></div><button class="btn btn-success" onclick="app.finishReq('${r.id}')">OK</button></div>`).join(''); },
     finishReq: function(id) { this.data.reqs=this.data.reqs.filter(r=>r.id!==id); this.save(); this.renderReqs(); },
     searchCli: function(v) { const c=this.data.clients.find(x=>x.id===v||x.name.toLowerCase().includes(v.toLowerCase())); document.getElementById('at-match').innerText=c?c.name:""; },
-    addOrder: function() { const v=document.getElementById('at-cod').value, c=this.data.clients.find(x=>x.id===v||x.name.toLowerCase().includes(v.toLowerCase())); const t=document.getElementById('at-type').value, o=document.getElementById('at-obs').value; if(!c && t!=='Elogio' && t!=='Reclamacao') return alert("Cliente inválido"); if(t==='Elogio'||t==='Reclamacao'){ this.data.feedbacks.unshift({msg:o,type:t,from:c?c.name:'Anonimo'}); alert('Feedback enviado!'); } else { this.data.orders.push({id:"P"+Date.now().toString().slice(-
+    addOrder: function() { const v=document.getElementById('at-cod').value, c=this.data.clients.find(x=>x.id===v||x.name.toLowerCase().includes(v.toLowerCase())); const t=document.getElementById('at-type').value, o=document.getElementById('at-obs').value; if(!c && t!=='Elogio' && t!=='Reclamacao') return alert("Cliente inválido"); if(t==='Elogio'||t==='Reclamacao'){ this.data.feedbacks.unshift({msg:o,type:t,from:c?c.name:'Anonimo'}); alert('Feedback enviado!'); } else { this.data.orders.push({id:"P"+Date.now().toString().slice(-4),cli:c.name,route:c.route,type:t,obs:o,time:Date.now(),sel:false}); alert('Pedido enviado!'); } this.save(); document.getElementById('at-obs').value=""; this.renderExped(); },
+    addLoss: function() { const i=document.getElementById('loss-item').value, v=parseFloat(document.getElementById('loss-val').value); if(!i||!v)return; this.data.losses.push({item:i,val:v}); this.save(); this.renderLosses(); },
+    renderLosses: function() { const t=this.data.losses.reduce((a,b)=>a+b.val,0); document.getElementById('loss-total').innerText="R$ "+t.toFixed(2); document.getElementById('loss-history').innerHTML=this.data.losses.slice(-5).map(l=>`<li>${l.item}: R$${l.val}</li>`).join(''); },
+    importCSV: function(type, input) { const file = input.files[0]; if(!file)return; const reader = new FileReader(); reader.onload = (e) => { const lines = e.target.result.split('\n'); if(type==='sales') { lines.forEach(l=>{const[prod,val,cli]=l.split(','); if(prod&&val)this.data.salesHistory.push({prod:prod.trim(),val:parseFloat(val),cli:cli?cli.trim():'Cliente'});}); alert('Vendas Importadas!'); this.renderSalesDashboard(); } if(type==='clients') { this.data.clients=[]; lines.forEach(l=>{const[id,n,r]=l.split(','); if(id)this.data.clients.push({id:id.trim(),name:n.trim(),route:r?r.trim():'GERAL'});}); this.renderAdminClients(); } this.save(); }; reader.readAsText(file); },
+    renderAdminClients: function(){ const t=document.querySelector('#table-clients tbody'); if(t)t.innerHTML=this.data.clients.map(c=>`<tr><td>${c.id}</td><td>${c.name}</td><td>${c.route}</td></tr>`).join(''); },
+    resetSystem: function(){ if(confirm("Apagar tudo?")){localStorage.removeItem('lablog_v7');location.reload();} },
+    feedIndex: 0,
+    feedLoop: function() { const f=this.data.feedbacks.filter(x=>x.type==='Elogio'); if(!f.length)return; document.getElementById('monitor-feed').innerText=`"${f[this.feedIndex].msg}"`; this.feedIndex=(this.feedIndex+1)%f.length; },
+    hms: function(s) { const p=s.split(':').map(Number); return (p[0]*3600)+(p[1]*60)+(p[2]||0); },
+    pad: function(n) { return n<10?'0'+n:n; }
+};
+
+// Start
+app.init();
+</script>
+</body>
+</html>
