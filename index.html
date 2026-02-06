@@ -367,8 +367,10 @@ const app = {
         document.getElementById('v-'+v).classList.add('active');
         document.getElementById('sidebar').classList.remove('active');
         document.getElementById('page-title').innerText = v.toUpperCase();
+        
         if(v==='vendas') this.populateClientSelect();
         if(v==='admin') this.renderAdminRoutes();
+        if(v==='monitor') this.renderMonitorSidePanel();
         if(v==='reqs') this.renderReqs();
         if(v==='exped') this.renderExped();
         if(v==='perdas') this.renderLosses();
@@ -390,6 +392,7 @@ const app = {
         if(active) {
             const id = active.id.replace('v-','');
             if(id==='admin') this.renderAdminRoutes();
+            if(id==='monitor') this.renderMonitorSidePanel();
             if(id==='exped') this.renderExped();
             if(id==='reqs') this.renderReqs();
             if(id==='perdas') this.renderLosses();
@@ -397,7 +400,6 @@ const app = {
     },
 
     // --- ADMIN ---
-    // --- ADMIN ROTAS (ATUALIZADA) ---
     renderAdminRoutes: function() {
         const div = document.getElementById('admin-routes-list');
         if(!div) return;
@@ -438,6 +440,21 @@ const app = {
         div.innerHTML = html;
     },
 
+    // --- NOVA FUNÇÃO DEDICADA AO MONITOR ---
+    renderMonitorSidePanel: function() {
+        const listEl = document.getElementById('monitor-schedule-list');
+        if(!listEl) return;
+        
+        // Agora ele limpa e redesenha sempre que for chamado
+        listEl.innerHTML = (this.data.routes||[]).sort((a,b)=>a.s.localeCompare(b.s)).map(r => `
+            <div style="margin-bottom:8px; color:#fff; display:flex; align-items:center; gap:8px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px">
+                <span style="color:${r.c1}; font-size:1.2rem;">●</span> 
+                <span style="font-weight:600">${r.name}</span> 
+                <span style="opacity:0.8; font-size:0.9rem; margin-left:auto; font-family:monospace">${r.s.substring(0,5)} - ${r.e.substring(0,5)}</span>
+            </div>
+        `).join('');
+    },
+    
     // Atualiza a barrinha colorida em tempo real
     updatePreview: function(i) {
         const c1 = document.getElementById(`r-c1-${i}`).value;
@@ -634,9 +651,6 @@ const app = {
     monitorLoop: function() {
         const now = new Date();
         const sec = (now.getHours()*3600) + (now.getMinutes()*60) + now.getSeconds();
-        const listEl = document.getElementById('monitor-schedule-list');
-        if(listEl && listEl.innerHTML === '') listEl.innerHTML = (this.data.routes||[]).map(r => `<div style="margin-bottom:5px; color:#fff"><span style="color:${r.c1}">●</span> ${r.name} - ${r.e.substring(0,5)}</div>`).join('');
-
         const active = (this.data.routes||[]).find(r => {
             const s = this.hms(r.s), e = this.hms(r.e);
             return s > e ? (sec >= s || sec <= e) : (sec >= s && sec <= e);
@@ -645,20 +659,25 @@ const app = {
         if(active && document.getElementById('monitor-rota')) {
             document.getElementById('monitor-bg').style.background = `linear-gradient(135deg, ${active.c1}, ${active.c2})`;
             document.getElementById('monitor-rota').innerText = active.name;
+            
+            // Lógica do Timer
             const e = this.hms(active.e); let t = new Date(); t.setHours(Math.floor(e/3600), Math.floor((e%3600)/60), e%60, 0);
             if(t < now) t.setDate(t.getDate()+1);
             const diff = t - now;
             const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
+            
             const timer = document.getElementById('monitor-timer');
             timer.innerText = `${h<10?'0'+h:h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
-            if(diff < 900000) timer.classList.add('timer-blink-red'); else timer.classList.remove('timer-blink-red');
+            
+            if(diff < 900000) timer.classList.add('timer-blink-red'); 
+            else timer.classList.remove('timer-blink-red');
         }
     }
-};
 
 window.app = app;
 app.init();
 </script>
 </body>
 </html>
+
 
