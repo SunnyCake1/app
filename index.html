@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LabLog v9.1 - Mobile</title>
+    <title>LabLog v9.2 - Full Mobile</title>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -12,91 +12,77 @@
         :root {
             --primary: #0f172a; --secondary: #334155; --accent: #38bdf8;
             --bg: #f8fafc; --card-bg: #ffffff;
-            --success: #22c55e; --danger: #ef4444; --warning: #f59e0b;
+            --success: #22c55e; --danger: #ef4444; --warning: #f59e0b; --money: #10b981;
         }
 
         body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); height: 100vh; display: flex; overflow: hidden; color: #1e293b; }
         
-        /* SIDEBAR (Barra Lateral) */
-        aside { 
-            width: 260px; background: var(--primary); color: white; display: flex; flex-direction: column; 
-            transition: 0.3s; z-index: 100; height: 100%;
-        }
-        
-        /* MAIN CONTENT */
+        /* LAYOUT & SIDEBAR */
+        aside { width: 260px; background: var(--primary); color: white; display: flex; flex-direction: column; transition: 0.3s; z-index: 100; height: 100%; }
         main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; transition: 0.3s; }
         
-        header { 
-            background: #fff; padding: 15px; border-bottom: 1px solid #e2e8f0; 
-            display: flex; justify-content: space-between; align-items: center; 
-            height: 60px; box-sizing: border-box;
-        }
-
-        /* MENU HAMBÚRGUER (Só aparece no mobile) */
+        header { background: #fff; padding: 15px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; height: 60px; box-sizing: border-box; }
         #mobile-btn { display: none; background: none; border: none; font-size: 1.5rem; color: var(--primary); cursor: pointer; }
 
         .brand { padding: 30px; font-size: 1.5rem; font-weight: 800; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .brand span { color: var(--accent); }
         nav { padding: 20px 10px; flex: 1; overflow-y: auto; }
-        
-        nav button { 
-            width: 100%; padding: 14px; margin-bottom: 8px; background: transparent; border: none; 
-            color: #94a3b8; text-align: left; cursor: pointer; border-radius: 8px; font-weight: 600; 
-            display: flex; align-items: center; gap: 12px; transition: 0.2s; 
-        }
+        nav button { width: 100%; padding: 14px; margin-bottom: 8px; background: transparent; border: none; color: #94a3b8; text-align: left; cursor: pointer; border-radius: 8px; font-weight: 600; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
         nav button:hover, nav button.active { background: var(--accent); color: #0f172a; }
 
-        /* VIEWS */
+        /* VIEWS & CARDS */
         .view { display: none; padding: 20px; overflow-y: auto; height: 100%; box-sizing: border-box; padding-bottom: 80px; }
         .view.active { display: block; }
-
-        /* CARDS & GRID */
-        .card { background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 15px; border: 1px solid #e2e8f0; }
-        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
-        .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 15px; border: 1px solid #e2e8f0; }
         
+        /* FORMS */
         input, select, textarea { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
-        .btn { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; }
+        .btn { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-warning { background: var(--warning); color: #000; }
 
-        /* MONITOR (TELÃO) */
+        /* MONITOR */
         #v-monitor { padding: 0 !important; background: #000; color: #fff; }
         .monitor-layout { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .monitor-side-panel { 
-            position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.6); 
-            padding: 15px; border-radius: 10px; backdrop-filter: blur(5px); text-align: left;
-        }
+        .monitor-side-panel { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.6); padding: 15px; border-radius: 10px; backdrop-filter: blur(5px); text-align: left; }
         .timer-big { font-size: 8vw; font-family: monospace; font-weight: 900; background: rgba(0,0,0,0.5); padding: 10px 30px; border-radius: 15px; border: 2px solid #fff; margin-top: 10px; }
         .timer-blink-red { animation: blink 1s infinite; background: #ef4444 !important; border-color: #ef4444 !important; }
         @keyframes blink { 50% { opacity: 0.5; } }
 
-        /* ADMIN - Lista de Rotas */
-        .admin-route-row { display: grid; grid-template-columns: 2fr 0.5fr 0.5fr 1fr 1fr 0.5fr; gap: 10px; align-items: center; padding: 10px; background: #f8fafc; border: 1px solid #eee; margin-bottom: 5px; border-radius: 8px; }
+        /* EXPEDIÇÃO */
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .filter-btn { padding: 8px 16px; border: 1px solid #cbd5e1; background: #fff; border-radius: 20px; white-space: nowrap; cursor: pointer; }
+        .filter-btn.active { background: var(--primary); color: #fff; }
+        .exp-card { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 10px; display: flex; overflow: hidden; }
+        .exp-strip { width: 10px; }
+        .exp-content { padding: 15px; flex: 1; display: flex; justify-content: space-between; align-items: center; }
+        .tag-chip { background: #0f172a; color: #fff; padding: 5px 10px; border-radius: 15px; display: inline-flex; align-items: center; gap: 5px; margin: 2px; font-size: 0.8rem; }
 
-        /* --- MODO MOBILE (Responsivo) --- */
+        /* ADMIN */
+        .admin-route-row { display: grid; grid-template-columns: 2fr 0.5fr 0.5fr 1fr 1fr 0.5fr; gap: 5px; align-items: center; padding: 10px; background: #f8fafc; border: 1px solid #eee; margin-bottom: 5px; border-radius: 8px; }
+
+        /* CRM */
+        .kpi-row { display: flex; gap: 10px; margin-bottom: 15px; }
+        .kpi-card { flex: 1; background: #f1f5f9; padding: 10px; border-radius: 8px; text-align: center; border-top: 3px solid #ccc; }
+        .suggestion-box { background: #ecfdf5; border: 1px solid #6ee7b7; color: #065f46; padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 0.9rem; }
+
+        /* MOBILE RESPONSIVE */
         @media (max-width: 768px) {
-            /* Sidebar vira gaveta escondida */
             aside { position: fixed; left: -260px; height: 100%; box-shadow: 5px 0 15px rgba(0,0,0,0.2); }
             aside.active { left: 0; }
-            #mobile-btn { display: block; } /* Botão aparece */
+            #mobile-btn { display: block; }
             
-            /* Ajustes Telão Mobile */
             #monitor-rota { font-size: 15vw !important; line-height: 1.1; }
             .timer-big { font-size: 18vw; padding: 5px 15px; width: 80%; }
             .monitor-side-panel { position: relative; top: auto; right: auto; width: 90%; margin-bottom: 20px; }
             
-            /* Ajustes Admin Mobile (Vira Cards) */
-            .admin-route-row { display: flex; flex-direction: column; gap: 5px; align-items: stretch; border-left: 5px solid var(--primary); }
-            .admin-route-header { display: none; } /* Esconde cabeçalho da tabela no mobile */
-            
-            /* Grids viram coluna única */
-            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .admin-route-row { display: flex; flex-direction: column; border-left: 5px solid var(--primary); }
+            .admin-route-header { display: none; }
         }
 
-        /* Login */
+        /* LOGIN */
         #login-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
         .login-box { background: white; padding: 30px; border-radius: 16px; width: 90%; max-width: 350px; text-align: center; }
     </style>
@@ -105,20 +91,21 @@
 
     <div id="login-overlay">
         <div class="login-box">
-            <h1 style="color:var(--primary)">LabLog <span style="color:var(--accent)">9.1</span></h1>
-            <p style="color:#64748b">Acesso Mobile</p>
+            <h1 style="color:var(--primary)">LabLog <span style="color:var(--accent)">9.2</span></h1>
+            <p style="color:#64748b">Sistema Completo</p>
             <select id="user-role">
                 <option value="admin">👑 ADMIN / GERÊNCIA</option>
                 <option value="vendas">💼 VENDEDOR</option>
-                <option value="telao">📺 MONITOR</option>
+                <option value="atend">☎️ ATENDIMENTO</option>
                 <option value="exped">📦 EXPEDIÇÃO</option>
+                <option value="telao">📺 MONITOR</option>
             </select>
-            <button class="btn btn-primary" onclick="window.app.login()">ENTRAR</button>
+            <button class="btn btn-primary" onclick="window.app.login()">ACESSAR</button>
         </div>
     </div>
 
     <aside id="sidebar">
-        <div class="brand">LAB<span>LOG</span> <button onclick="window.app.toggleMenu()" style="float:right; background:none; border:none; color:#fff; display:none" id="close-menu-btn">×</button></div>
+        <div class="brand">LAB<span>LOG</span> <button onclick="window.app.toggleMenu()" style="float:right; background:none; border:none; color:#fff; display:none; font-size:2rem; line-height:0.5">×</button></div>
         <nav id="menu-nav"></nav>
         <div style="padding:20px;">
             <button onclick="window.app.logout()" style="background:rgba(255,255,255,0.1); border:none; color:#fff; width:100%; padding:10px; border-radius:6px;">Sair</button>
@@ -144,7 +131,7 @@
                 <div id="monitor-rota" style="font-size: 6vw; font-weight: 900; text-transform: uppercase;">---</div>
                 <div id="monitor-timer" class="timer-big">00:00:00</div>
                 <div style="margin-top: 30px; background: rgba(0,0,0,0.4); padding: 10px 20px; border-radius: 50px;">
-                    <i class="fas fa-comment-alt" style="color:var(--accent)"></i> <span id="monitor-feed">Carregando...</span>
+                    <i class="fas fa-comment-alt" style="color:var(--accent)"></i> <span id="monitor-feed">Sistema Online</span>
                 </div>
             </div>
         </div>
@@ -160,10 +147,12 @@
                 <button class="btn btn-primary" onclick="window.app.saveRoutesAdmin()">Salvar</button>
             </div>
             <div class="card">
-                <h3>Importar CSV</h3>
-                <div class="upload-zone" onclick="document.getElementById('file-cli').click()" style="padding:20px; border:2px dashed #ccc; text-align:center">
-                    <i class="fas fa-users"></i> Importar Clientes
+                <h3>Importar Dados</h3>
+                <div class="kpi-row">
+                    <button class="btn btn-warning" onclick="document.getElementById('file-cli').click()">Clientes CSV</button>
                     <input type="file" id="file-cli" hidden onchange="window.app.importCSV('clients', this)">
+                    <button class="btn btn-warning" onclick="document.getElementById('file-sales').click()">Vendas CSV</button>
+                    <input type="file" id="file-sales" hidden onchange="window.app.importCSV('sales', this)">
                 </div>
             </div>
         </div>
@@ -178,12 +167,16 @@
 
             <div id="crm-content" style="display:none">
                 <div class="card">
-                    <h2 id="crm-name">Cliente</h2>
-                    <span id="crm-route" style="background:#333; color:#fff; padding:3px 8px; border-radius:5px; font-size:0.8rem">ROTA</span>
-                    <div class="grid-2" style="margin-top:10px">
-                        <div class="kpi-mini"><b>Faturamento:</b> <span id="kpi-fat">R$ 0</span></div>
-                        <div class="kpi-mini"><b>Ticket Médio:</b> <span id="kpi-ticket">R$ 0</span></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center">
+                        <h2 id="crm-name" style="margin:0">Cliente</h2>
+                        <span id="crm-route" style="background:#333; color:#fff; padding:3px 8px; border-radius:5px; font-size:0.8rem">ROTA</span>
                     </div>
+                    <div class="kpi-row" style="margin-top:15px">
+                        <div class="kpi-card" style="border-top-color:var(--money)"><small>FATURAMENTO</small><br><b id="kpi-fat">R$ 0</b></div>
+                        <div class="kpi-card" style="border-top-color:var(--accent)"><small>TICKET</small><br><b id="kpi-ticket">R$ 0</b></div>
+                    </div>
+                    <div><canvas id="salesChart" style="max-height:200px"></canvas></div>
+                    <div class="suggestion-box"><i class="fas fa-lightbulb"></i> <span id="crm-suggestion">...</span></div>
                 </div>
                 
                 <div class="card">
@@ -196,13 +189,57 @@
         </div>
 
         <div id="v-exped" class="view">
+            <div class="filter-bar">
+                <button class="filter-btn active" onclick="window.app.filterExped('TODOS', this)">TODOS</button>
+                <button class="filter-btn" onclick="window.app.filterExped('AMARELO', this)">🟡 AM</button>
+                <button class="filter-btn" onclick="window.app.filterExped('CORAL', this)">🟠 COR</button>
+                <button class="filter-btn" onclick="window.app.filterExped('BEGE', this)">🟤 BEG</button>
+            </div>
             <div class="card">
                 <h3>Montagem de Lote</h3>
                 <input type="text" id="exp-input" placeholder="Bipe o ID aqui..." onkeydown="window.app.handleTagInput(event)">
-                <div id="tag-area" class="tag-container" style="margin-top:10px"></div>
+                <div id="tag-area" style="margin-top:10px; display:flex; flex-wrap:wrap"></div>
+                <button class="btn btn-success" style="margin-top:10px" onclick="window.app.printLote()"><i class="fas fa-print"></i> Imprimir Lote</button>
             </div>
             <h3>Pendentes</h3>
             <div id="exped-list"></div>
+        </div>
+
+        <div id="v-reqs" class="view">
+            <div class="card">
+                <h3>Nova Requisição</h3>
+                <select id="req-sector"><option>Montagem</option><option>Surfaçagem</option><option>Adm</option></select>
+                <select id="req-type"><option>RH</option><option>Insumos</option><option>Manutenção</option></select>
+                <textarea id="req-desc" placeholder="Descreva..."></textarea>
+                <button class="btn btn-primary" onclick="window.app.addReq()">Abrir Chamado</button>
+            </div>
+            <h3>Chamados Abertos</h3>
+            <div id="req-list"></div>
+        </div>
+
+        <div id="v-atend" class="view">
+            <div class="card">
+                <h3>Solicitação / Coleta</h3>
+                <input type="text" id="at-cod" placeholder="Cliente..." oninput="window.app.searchCli(this.value)">
+                <small id="at-match" style="color:var(--success)"></small>
+                <select id="at-type"><option>Coleta</option><option>Elogio</option><option>Reclamacao</option></select>
+                <textarea id="at-obs" placeholder="Obs..."></textarea>
+                <button class="btn btn-accent" onclick="window.app.addOrder()">Enviar</button>
+            </div>
+        </div>
+
+        <div id="v-perdas" class="view">
+            <div class="card">
+                <h3>Registrar Perda</h3>
+                <input type="text" id="loss-item" placeholder="Item">
+                <select id="loss-reason"><option>Quebra</option><option>Erro Humano</option></select>
+                <input type="number" id="loss-val" placeholder="Valor R$">
+                <button class="btn btn-danger" onclick="window.app.addLoss()">Registrar</button>
+            </div>
+            <div class="card">
+                <h3>Total: <span id="loss-total" style="color:var(--danger)">R$ 0,00</span></h3>
+                <ul id="loss-history"></ul>
+            </div>
         </div>
 
     </main>
@@ -227,7 +264,7 @@ const db = getFirestore(firebaseApp);
 const auth = getAuth(firebaseApp);
 
 const app = {
-    data: { clients: [], salesHistory: [], routes: [], orders: [] },
+    data: { clients: [], salesHistory: [], routes: [], orders: [], reqs: [], losses: [], tags: [], filter: 'TODOS' },
 
     init: function() {
         onAuthStateChanged(auth, (user) => {
@@ -242,11 +279,10 @@ const app = {
             }
         });
         setInterval(() => this.monitorLoop(), 1000);
+        setInterval(() => this.updateTimers(), 1000);
     },
 
-    toggleMenu: function() {
-        document.getElementById('sidebar').classList.toggle('active');
-    },
+    toggleMenu: function() { document.getElementById('sidebar').classList.toggle('active'); },
 
     login: async function() {
         const role = document.getElementById('user-role').value;
@@ -268,16 +304,22 @@ const app = {
         if(role==='admin' || role==='vendas') h += `<button onclick="window.app.nav('vendas')"><i class="fas fa-briefcase"></i> Vendas</button>`;
         if(role==='admin') h += `<button onclick="window.app.nav('admin')"><i class="fas fa-cogs"></i> Admin</button>`;
         if(role==='admin' || role==='exped') h += `<button onclick="window.app.nav('exped')"><i class="fas fa-barcode"></i> Expedição</button>`;
+        if(role==='admin' || role==='atend') h += `<button onclick="window.app.nav('atend')"><i class="fas fa-headset"></i> Atendimento</button>`;
+        if(role==='admin' || role==='reqs') h += `<button onclick="window.app.nav('reqs')"><i class="fas fa-clipboard-list"></i> Requisições</button>`;
+        if(role==='admin') h += `<button onclick="window.app.nav('perdas')"><i class="fas fa-chart-line"></i> Finanças</button>`;
         m.innerHTML = h;
     },
 
     nav: function(v) {
         document.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
         document.getElementById('v-'+v).classList.add('active');
-        document.getElementById('sidebar').classList.remove('active'); // Fecha menu no mobile ao clicar
+        document.getElementById('sidebar').classList.remove('active');
         document.getElementById('page-title').innerText = v.toUpperCase();
         if(v==='vendas') this.populateClientSelect();
         if(v==='admin') this.renderAdminRoutes();
+        if(v==='reqs') this.renderReqs();
+        if(v==='exped') this.renderExped();
+        if(v==='perdas') this.renderLosses();
     },
 
     startRealtimeSync: function() {
@@ -285,9 +327,7 @@ const app = {
             if(snap.exists()) {
                 this.data = { ...this.data, ...snap.data() };
                 this.refreshCurrentView();
-            } else {
-                this.save(); // Cria se não existir
-            }
+            } else { this.save(); }
         });
     },
 
@@ -298,40 +338,13 @@ const app = {
         if(active) {
             const id = active.id.replace('v-','');
             if(id==='admin') this.renderAdminRoutes();
-            if(id==='vendas') { /* Recarregar KPIs se necessário */ }
+            if(id==='exped') this.renderExped();
+            if(id==='reqs') this.renderReqs();
+            if(id==='perdas') this.renderLosses();
         }
     },
 
-    // --- FUNÇÕES MONITOR ---
-    monitorLoop: function() {
-        const now = new Date();
-        const sec = (now.getHours()*3600) + (now.getMinutes()*60) + now.getSeconds();
-        const listEl = document.getElementById('monitor-schedule-list');
-        
-        // Renderiza lista lateral se vazia
-        if(listEl && listEl.innerHTML === '') {
-            listEl.innerHTML = (this.data.routes||[]).map(r => `<div style="display:flex; gap:10px; margin-bottom:5px; color:#fff"><div style="width:10px;height:10px;border-radius:50%;background:${r.c1}"></div> ${r.name} - ${r.e.substring(0,5)}</div>`).join('');
-        }
-
-        const active = (this.data.routes||[]).find(r => {
-            const s = this.hms(r.s), e = this.hms(r.e);
-            return s > e ? (sec >= s || sec <= e) : (sec >= s && sec <= e);
-        });
-
-        if(active && document.getElementById('monitor-rota')) {
-            document.getElementById('monitor-bg').style.background = `linear-gradient(135deg, ${active.c1}, ${active.c2})`;
-            document.getElementById('monitor-rota').innerText = active.name;
-            const e = this.hms(active.e); let t = new Date(); t.setHours(Math.floor(e/3600), Math.floor((e%3600)/60), e%60, 0);
-            if(t < now) t.setDate(t.getDate()+1);
-            const diff = t - now;
-            const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
-            const timer = document.getElementById('monitor-timer');
-            timer.innerText = `${h<10?'0'+h:h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
-            if(diff < 900000) timer.classList.add('timer-blink-red'); else timer.classList.remove('timer-blink-red');
-        }
-    },
-
-    // --- ADMIN ROTAS ---
+    // --- ADMIN ---
     renderAdminRoutes: function() {
         const div = document.getElementById('admin-routes-list');
         if(!div) return;
@@ -342,7 +355,7 @@ const app = {
                 <input type="color" value="${r.c2}" id="r-c2-${i}">
                 <input value="${r.s}" id="r-s-${i}" type="time" step="1">
                 <input value="${r.e}" id="r-e-${i}" type="time" step="1">
-                <button class="btn btn-danger" onclick="window.app.removeRoute(${i})">Del</button>
+                <button class="btn btn-danger" onclick="window.app.removeRoute(${i})">X</button>
             </div>
         `).join('');
     },
@@ -371,9 +384,22 @@ const app = {
         div.style.display='block';
         const c = this.data.clients.find(x=>x.id===id);
         document.getElementById('crm-name').innerText = c.name;
-        // Histórico
-        const hist = document.getElementById('visit-history');
-        hist.innerHTML = (c.visits||[]).map(v=>`<div style="border-bottom:1px solid #eee; padding:5px"><small>${v.date}</small><br>${v.note}</div>`).join('');
+        document.getElementById('crm-route').innerText = "ROTA "+c.route;
+        
+        // KPIs
+        const sales = (this.data.salesHistory||[]).filter(s=>s.cli===c.name);
+        const fat = sales.reduce((a,b)=>a+b.val,0);
+        document.getElementById('kpi-fat').innerText = "R$ "+fat.toFixed(2);
+        document.getElementById('kpi-ticket').innerText = "R$ "+(sales.length?fat/sales.length:0).toFixed(2);
+        
+        // Chart
+        const ctx = document.getElementById('salesChart');
+        if(window.myChart) window.myChart.destroy();
+        const d={}; sales.forEach(s=>d[s.prod]=(d[s.prod]||0)+s.val);
+        window.myChart = new Chart(ctx, {type:'bar', data:{labels:Object.keys(d), datasets:[{label:'Vendas',data:Object.values(d),backgroundColor:'#38bdf8'}]}});
+        
+        // Visits
+        document.getElementById('visit-history').innerHTML = (c.visits||[]).map(v=>`<div style="border-bottom:1px solid #eee; padding:5px"><small>${v.date}</small><br>${v.note}</div>`).join('');
     },
     addVisit: function() {
         const id = document.getElementById('crm-select').value;
@@ -384,20 +410,114 @@ const app = {
         this.save(); document.getElementById('visit-note').value=""; this.loadClientCRM();
     },
 
+    // --- EXPEDIÇÃO ---
+    handleTagInput: function(e) { 
+        if(e.key==='Enter'||e.key===','){ e.preventDefault(); 
+            const v=e.target.value.trim().toUpperCase(); 
+            if(v && !this.data.tags.includes(v)) {
+                this.data.tags.push(v); this.renderTags();
+                const o = (this.data.orders||[]).find(o=>o.id===v);
+                if(o){ o.sel=true; this.save(); }
+            }
+            e.target.value=""; 
+        }
+    },
+    renderTags: function() {
+        const area = document.getElementById('tag-area');
+        area.innerHTML = (this.data.tags||[]).map(t=>`<div class="tag-chip">${t} <span onclick="window.app.removeTag('${t}')" style="cursor:pointer;margin-left:5px">×</span></div>`).join('');
+    },
+    removeTag: function(t) { this.data.tags=this.data.tags.filter(x=>x!==t); this.renderTags(); },
+    printLote: function() { alert("Imprimindo: "+this.data.tags.join(", ")); },
+    filterExped: function(f, btn) { 
+        this.data.filter=f; 
+        document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); 
+        this.renderExped(); 
+    },
+    renderExped: function() {
+        const l = document.getElementById('exped-list');
+        const f = (this.data.orders||[]).filter(o => this.data.filter==='TODOS' || (o.route||'').includes(this.data.filter));
+        l.innerHTML = f.map(o=>`<div class="exp-card"><div class="exp-strip" style="background:${this.getRouteColor(o.route)}"></div><div class="exp-content"><div><b>${o.cli}</b><br><small>${o.route} - ${o.id}</small></div><div class="exp-timer" data-time="${o.time}">...</div></div></div>`).join('');
+        this.updateTimers();
+    },
+    getRouteColor: function(r) { return (r||'').includes('AMARELO')?'#fbbf24':(r||'').includes('CORAL')?'#ff7f50':(r||'').includes('BEGE')?'#fcd34d':'#ccc'; },
+    updateTimers: function() {
+        document.querySelectorAll('.exp-timer').forEach(el=>{
+            const d=Date.now()-parseInt(el.getAttribute('data-time'));
+            const h=Math.floor(d/3600000), m=Math.floor((d%3600000)/60000);
+            el.innerText=`${h}h ${m}m`;
+            if(d>7200000) el.style.color='red';
+        });
+    },
+
+    // --- REQUISIÇÕES & ATENDIMENTO & PERDAS ---
+    addReq: function() {
+        const s=document.getElementById('req-sector').value, t=document.getElementById('req-type').value, d=document.getElementById('req-desc').value;
+        if(!d)return;
+        if(!this.data.reqs) this.data.reqs=[];
+        this.data.reqs.push({id:Date.now(), s, t, d}); this.save(); this.renderReqs(); document.getElementById('req-desc').value="";
+    },
+    renderReqs: function() { document.getElementById('req-list').innerHTML = (this.data.reqs||[]).map(r=>`<div class="card" style="padding:10px"><b>${r.t}</b> (${r.s})<br>${r.d}</div>`).join(''); },
+    
+    searchCli: function(v) { const c = this.data.clients.find(x=>x.name.toLowerCase().includes(v.toLowerCase())); document.getElementById('at-match').innerText=c?c.name:""; },
+    addOrder: function() {
+        const name = document.getElementById('at-match').innerText || "Anonimo";
+        const c = this.data.clients.find(x=>x.name===name);
+        const type = document.getElementById('at-type').value;
+        if(!this.data.orders) this.data.orders=[];
+        this.data.orders.push({id:"P"+Date.now().toString().slice(-4), cli:name, route:c?c.route:'BALCAO', type, time:Date.now()});
+        this.save(); alert("Enviado para Expedição!");
+    },
+    
+    addLoss: function() {
+        const i=document.getElementById('loss-item').value, v=parseFloat(document.getElementById('loss-val').value);
+        if(!i||!v)return;
+        if(!this.data.losses) this.data.losses=[];
+        this.data.losses.push({item:i, val:v}); this.save(); this.renderLosses();
+    },
+    renderLosses: function() {
+        const t = (this.data.losses||[]).reduce((a,b)=>a+b.val,0);
+        document.getElementById('loss-total').innerText = "R$ "+t.toFixed(2);
+        document.getElementById('loss-history').innerHTML = (this.data.losses||[]).slice(-5).map(l=>`<li>${l.item}: R$${l.val}</li>`).join('');
+    },
+
     // --- UTIL ---
     importCSV: function(type, input) {
         const file = input.files[0];
         const reader = new FileReader();
         reader.onload = (e) => {
             const rows = e.target.result.split('\n');
-            if(type==='clients') {
-                this.data.clients = rows.map(r=>{ const[id,n]=r.split(','); return id?{id:id.trim(),name:n.trim(),visits:[]}:null; }).filter(x=>x);
-            }
+            if(type==='clients') this.data.clients = rows.map(r=>{ const[id,n,rt]=r.split(','); return id?{id:id.trim(),name:n.trim(),route:rt?rt.trim():'GERAL',visits:[]}:null; }).filter(x=>x);
+            if(type==='sales') this.data.salesHistory = rows.map(r=>{ const[p,v,c]=r.split(','); return p?{prod:p.trim(),val:parseFloat(v),cli:c?c.trim():'Anonimo'}:null; }).filter(x=>x);
             this.save(); alert("Importado!");
         }
         reader.readAsText(file);
     },
-    hms: s => { const p=s.split(':').map(Number); return (p[0]*3600)+(p[1]*60)+(p[2]||0); }
+    hms: s => { const p=s.split(':').map(Number); return (p[0]*3600)+(p[1]*60)+(p[2]||0); },
+
+    // --- MONITOR ---
+    monitorLoop: function() {
+        const now = new Date();
+        const sec = (now.getHours()*3600) + (now.getMinutes()*60) + now.getSeconds();
+        const listEl = document.getElementById('monitor-schedule-list');
+        if(listEl && listEl.innerHTML === '') listEl.innerHTML = (this.data.routes||[]).map(r => `<div style="margin-bottom:5px; color:#fff"><span style="color:${r.c1}">●</span> ${r.name} - ${r.e.substring(0,5)}</div>`).join('');
+
+        const active = (this.data.routes||[]).find(r => {
+            const s = this.hms(r.s), e = this.hms(r.e);
+            return s > e ? (sec >= s || sec <= e) : (sec >= s && sec <= e);
+        });
+
+        if(active && document.getElementById('monitor-rota')) {
+            document.getElementById('monitor-bg').style.background = `linear-gradient(135deg, ${active.c1}, ${active.c2})`;
+            document.getElementById('monitor-rota').innerText = active.name;
+            const e = this.hms(active.e); let t = new Date(); t.setHours(Math.floor(e/3600), Math.floor((e%3600)/60), e%60, 0);
+            if(t < now) t.setDate(t.getDate()+1);
+            const diff = t - now;
+            const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
+            const timer = document.getElementById('monitor-timer');
+            timer.innerText = `${h<10?'0'+h:h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
+            if(diff < 900000) timer.classList.add('timer-blink-red'); else timer.classList.remove('timer-blink-red');
+        }
+    }
 };
 
 window.app = app;
