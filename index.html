@@ -82,6 +82,53 @@
             .admin-route-header { display: none; }
         }
 
+        /* --- ATUALIZE NO SEU CSS --- */
+.admin-route-row { 
+    display: grid; 
+    /* Ajustei as colunas para caber o botão de igualar e o preview */
+    grid-template-columns: 1.5fr 0.5fr 0.2fr 0.5fr 1fr 1fr 0.5fr; 
+    gap: 8px; 
+    align-items: center; 
+    padding: 12px; 
+    background: #fff; 
+    border: 1px solid #e2e8f0; 
+    margin-bottom: 8px; 
+    border-radius: 8px; 
+    transition: 0.2s;
+}
+
+/* Barra de preview do gradiente */
+.route-preview {
+    height: 8px;
+    border-radius: 4px;
+    grid-column: 1 / -1; /* Ocupa a linha toda abaixo dos inputs */
+    margin-top: 5px;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+/* Botão pequeno de igualar cor */
+.btn-mini {
+    padding: 5px;
+    background: #e2e8f0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: #64748b;
+}
+.btn-mini:hover { background: #cbd5e1; color: #000; }
+
+/* No Mobile, ajustamos para ficar bonito */
+@media (max-width: 768px) {
+    .admin-route-row { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 10px;
+        border-left: 5px solid var(--primary);
+    }
+    .route-preview { width: 100%; height: 15px; }
+}
+
         /* LOGIN */
         #login-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
         .login-box { background: white; padding: 30px; border-radius: 16px; width: 90%; max-width: 350px; text-align: center; }
@@ -140,8 +187,13 @@
             <div class="card">
                 <h3>Configuração de Rotas</h3>
                 <div class="admin-route-row admin-route-header">
-                    <div>Nome</div><div>Cor 1</div><div>Cor 2</div><div>Início</div><div>Fim</div><div>Del</div>
-                </div>
+                    <div>Nome</div>
+                    <div>Cor 1</div>
+                    <div></div> <div>Cor 2</div>
+                    <div>Início</div>
+                    <div>Fim</div>
+                    <div>Del</div>
+            </div>
                 <div id="admin-routes-list"></div>
                 <button class="btn btn-success" onclick="window.app.addRouteRow()">+ Rota</button>
                 <button class="btn btn-primary" onclick="window.app.saveRoutesAdmin()">Salvar</button>
@@ -345,31 +397,115 @@ const app = {
     },
 
     // --- ADMIN ---
+    // --- ADMIN ROTAS (ATUALIZADA) ---
     renderAdminRoutes: function() {
         const div = document.getElementById('admin-routes-list');
         if(!div) return;
-        div.innerHTML = (this.data.routes||[]).map((r, i) => `
-            <div class="admin-route-row">
-                <input value="${r.name}" id="r-name-${i}" placeholder="Nome">
-                <input type="color" value="${r.c1}" id="r-c1-${i}">
-                <input type="color" value="${r.c2}" id="r-c2-${i}">
+        
+        // Cabeçalho com botão extra
+        let html = `
+            <div style="display:flex; justify-content:flex-end; margin-bottom:10px;">
+                <button class="btn-mini" onclick="window.app.unifyAllColors()" style="padding:5px 15px">
+                    <i class="fas fa-paint-roller"></i> Tirar Gradientes (Todas Sólidas)
+                </button>
+            </div>
+        `;
+
+        html += (this.data.routes||[]).map((r, i) => `
+            <div class="admin-route-row" id="row-${i}">
+                <input value="${r.name}" id="r-name-${i}" placeholder="Nome da Rota" style="font-weight:bold">
+                
+                <input type="color" value="${r.c1}" id="r-c1-${i}" 
+                       oninput="window.app.updatePreview(${i})">
+                
+                <button class="btn-mini" title="Copiar Cor 1 para Cor 2" onclick="window.app.copyColorRow(${i})">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+
+                <input type="color" value="${r.c2}" id="r-c2-${i}" 
+                       oninput="window.app.updatePreview(${i})">
+
                 <input value="${r.s}" id="r-s-${i}" type="time" step="1">
                 <input value="${r.e}" id="r-e-${i}" type="time" step="1">
-                <button class="btn btn-danger" onclick="window.app.removeRoute(${i})">X</button>
+                
+                <button class="btn btn-danger" onclick="window.app.removeRoute(${i})" style="padding:5px"><i class="fas fa-trash"></i></button>
+                
+                <div id="preview-${i}" class="route-preview" 
+                     style="background: linear-gradient(90deg, ${r.c1}, ${r.c2})"></div>
             </div>
         `).join('');
+
+        div.innerHTML = html;
     },
+
+    // Atualiza a barrinha colorida em tempo real
+    updatePreview: function(i) {
+        const c1 = document.getElementById(`r-c1-${i}`).value;
+        const c2 = document.getElementById(`r-c2-${i}`).value;
+        document.getElementById(`preview-${i}`).style.background = `linear-gradient(90deg, ${c1}, ${c2})`;
+    },
+
+    // Copia C1 para C2 na linha específica
+    copyColorRow: function(i) {
+        const c1 = document.getElementById(`r-c1-${i}`).value;
+        document.getElementById(`r-c2-${i}`).value = c1;
+        this.updatePreview(i); // Atualiza visual
+    },
+
+    // Deixa TODAS as rotas com cor sólida (C2 vira igual C1)
+    unifyAllColors: function() {
+        if(!confirm("Isso vai remover o gradiente de todas as rotas (copiando a Cor 1 para a Cor 2). Continuar?")) return;
+        
+        // Aplica na tela
+        this.data.routes.forEach((_, i) => {
+            const c1 = document.getElementById(`r-c1-${i}`).value;
+            document.getElementById(`r-c2-${i}`).value = c1;
+            this.updatePreview(i);
+        });
+    },
+    
     addRouteRow: function() { if(!this.data.routes) this.data.routes=[]; this.data.routes.push({name:"Nova",c1:"#000",c2:"#fff",s:"00:00:00",e:"00:00:00"}); this.renderAdminRoutes(); },
     removeRoute: function(i) { if(confirm("Apagar?")){this.data.routes.splice(i,1); this.save();} },
+    // --- SALVAR COM VALIDAÇÃO DE HORÁRIO ---
     saveRoutesAdmin: function() {
-        this.data.routes.forEach((r, i) => {
-            r.name = document.getElementById(`r-name-${i}`).value;
-            r.c1 = document.getElementById(`r-c1-${i}`).value;
-            r.c2 = document.getElementById(`r-c2-${i}`).value;
-            r.s = document.getElementById(`r-s-${i}`).value;
-            r.e = document.getElementById(`r-e-${i}`).value;
-        });
-        this.save(); alert("Salvo!");
+        // 1. Captura os valores da tela para a memória
+        const tempRoutes = this.data.routes.map((_, i) => ({
+            name: document.getElementById(`r-name-${i}`).value,
+            c1: document.getElementById(`r-c1-${i}`).value,
+            c2: document.getElementById(`r-c2-${i}`).value,
+            s: document.getElementById(`r-s-${i}`).value,
+            e: document.getElementById(`r-e-${i}`).value
+        }));
+
+        // 2. Ordena por horário de início para checar sequência
+        tempRoutes.sort((a, b) => a.s.localeCompare(b.s));
+
+        // 3. Validação de "Buracos"
+        let error = null;
+        for (let i = 0; i < tempRoutes.length - 1; i++) {
+            const currentEnd = tempRoutes[i].e; // Fim da atual (ex: 10:00:00)
+            const nextStart = tempRoutes[i+1].s; // Início da próxima
+            
+            // Aceita diferença de até 1 segundo
+            const tEnd = this.hms(currentEnd);
+            const tStart = this.hms(nextStart);
+
+            if (Math.abs(tStart - tEnd) > 1) { 
+                error = `ERRO DE HORÁRIO:\nA rota "${tempRoutes[i].name}" termina às ${currentEnd}, mas a próxima rota "${tempRoutes[i+1].name}" só começa às ${nextStart}.\n\nCorrija o intervalo!`;
+                break;
+            }
+        }
+
+        if (error) {
+            alert(error); // Trava o salvamento
+            return; 
+        }
+
+        // 4. Se passou, salva no Firebase
+        this.data.routes = tempRoutes;
+        this.save();
+        alert("Rotas validadas e salvas com sucesso!");
+        this.renderAdminRoutes(); // Redesenha para garantir a ordem visual
     },
 
     // --- CRM ---
@@ -525,3 +661,4 @@ app.init();
 </script>
 </body>
 </html>
+
