@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LabLog v9.3 - Management</title>
+    <title>LabLog v9.4 - Pro Login</title>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -17,7 +17,7 @@
 
         body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); height: 100vh; display: flex; overflow: hidden; color: #1e293b; }
         
-        /* LAYOUT & SIDEBAR */
+        /* SIDEBAR */
         aside { width: 260px; background: var(--primary); color: white; display: flex; flex-direction: column; transition: 0.3s; z-index: 100; height: 100%; }
         main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; transition: 0.3s; }
         
@@ -30,12 +30,11 @@
         nav button { width: 100%; padding: 14px; margin-bottom: 8px; background: transparent; border: none; color: #94a3b8; text-align: left; cursor: pointer; border-radius: 8px; font-weight: 600; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
         nav button:hover, nav button.active { background: var(--accent); color: #0f172a; }
 
-        /* VIEWS & CARDS */
+        /* VIEWS & UI */
         .view { display: none; padding: 20px; overflow-y: auto; height: 100%; box-sizing: border-box; padding-bottom: 80px; }
         .view.active { display: block; }
         .card { background: var(--card-bg); border-radius: 12px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 15px; border: 1px solid #e2e8f0; }
         
-        /* FORMS */
         input, select, textarea { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
         .btn { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-primary { background: var(--primary); color: white; }
@@ -44,35 +43,38 @@
         .btn-warning { background: var(--warning); color: #000; }
         .btn-mini { padding: 5px; background: #e2e8f0; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; color: #64748b; }
 
-        /* ADMIN TABLE */
-        .admin-route-row { display: grid; grid-template-columns: 1.5fr 0.5fr 0.2fr 0.5fr 1fr 1fr 0.5fr; gap: 8px; align-items: center; padding: 12px; background: #fff; border: 1px solid #e2e8f0; margin-bottom: 8px; border-radius: 8px; }
-        .route-preview { height: 8px; border-radius: 4px; grid-column: 1 / -1; margin-top: 5px; border: 1px solid rgba(0,0,0,0.1); }
-        .user-row { display: flex; gap: 10px; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
-
-        /* MONITOR */
+        /* MONITOR (TELÃO) */
         #v-monitor { padding: 0 !important; background: #000; color: #fff; }
         .monitor-layout { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; }
         .monitor-side-panel { position: absolute; top: 80px; right: 20px; background: rgba(0,0,0,0.6); padding: 15px; border-radius: 10px; backdrop-filter: blur(5px); text-align: left; min-width: 250px; }
         .timer-big { font-size: 8vw; font-family: monospace; font-weight: 900; background: rgba(0,0,0,0.5); padding: 10px 30px; border-radius: 15px; border: 2px solid #fff; margin-top: 10px; }
         .timer-blink-red { animation: blink 1s infinite; background: #ef4444 !important; border-color: #ef4444 !important; }
         
-        /* AVISO URGENTE */
-        #urgent-banner { 
-            position: absolute; top: 0; left: 0; width: 100%; padding: 15px; 
-            font-size: 2rem; font-weight: 900; text-align: center; z-index: 99; display: none;
-            text-transform: uppercase; letter-spacing: 2px;
-        }
+        /* NOVO: Botão Fullscreen */
+        #fullscreen-btn { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); border: none; color: white; padding: 10px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; z-index: 200; transition: 0.2s; }
+        #fullscreen-btn:hover { background: rgba(255,255,255,0.4); transform: scale(1.1); }
+
+        #urgent-banner { position: absolute; top: 0; left: 0; width: 100%; padding: 15px; font-size: 2rem; font-weight: 900; text-align: center; z-index: 99; display: none; text-transform: uppercase; letter-spacing: 2px; }
         .urgent-mode { background: #ef4444; color: white; animation: blink 0.5s infinite; }
         .normal-notice { background: var(--accent); color: #000; }
-
-        /* ELOGIOS FEED */
         .feed-bar { position: absolute; bottom: 30px; background: rgba(0,0,0,0.6); padding: 15px 40px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.3); max-width: 80%; }
         .feed-text { font-size: 1.5rem; font-weight: bold; font-style: italic; color: #fff; animation: fadeIn 1s; }
 
         @keyframes blink { 50% { opacity: 0.8; background: #b91c1c; } }
         @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
-        /* MOBILE RESPONSIVE */
+        /* TABELA ADMIN */
+        .admin-route-row { display: grid; grid-template-columns: 1.5fr 0.5fr 0.2fr 0.5fr 1fr 1fr 0.5fr; gap: 8px; align-items: center; padding: 12px; background: #fff; border: 1px solid #e2e8f0; margin-bottom: 8px; border-radius: 8px; }
+        .route-preview { height: 8px; border-radius: 4px; grid-column: 1 / -1; margin-top: 5px; border: 1px solid rgba(0,0,0,0.1); }
+        .user-row { display: flex; gap: 10px; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
+
+        /* LOGIN NOVO */
+        #login-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: white; padding: 40px; border-radius: 16px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .login-input { background: #f1f5f9; border: 2px solid #e2e8f0; font-size: 1.1rem; transition: 0.2s; }
+        .login-input:focus { border-color: var(--accent); outline: none; background: #fff; }
+
+        /* MOBILE */
         @media (max-width: 768px) {
             aside { position: fixed; left: -260px; height: 100%; box-shadow: 5px 0 15px rgba(0,0,0,0.2); }
             aside.active { left: 0; }
@@ -84,19 +86,24 @@
             .admin-route-header { display: none; }
             #urgent-banner { font-size: 1.2rem; }
         }
-
-        #login-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: white; padding: 30px; border-radius: 16px; width: 90%; max-width: 350px; text-align: center; }
     </style>
 </head>
 <body>
 
     <div id="login-overlay">
         <div class="login-box">
-            <h1 style="color:var(--primary)">LabLog <span style="color:var(--accent)">9.3</span></h1>
-            <p style="color:#64748b">ERP Ótico</p>
-            <button class="btn btn-primary" onclick="window.app.login()">ENTRAR COM E-MAIL</button>
-            <small style="display:block; margin-top:15px; color:#999">Primeiro acesso? Use admin@lablog.com</small>
+            <h1 style="color:var(--primary); margin-bottom:5px">LabLog <span style="color:var(--accent)">9.4</span></h1>
+            <p style="color:#64748b; margin-bottom:25px">Gestão de Laboratório</p>
+            
+            <input type="email" id="login-email" placeholder="Seu E-mail" class="login-input">
+            <input type="password" id="login-pass" placeholder="Sua Senha" class="login-input">
+            
+            <button class="btn btn-primary" onclick="window.app.login()" id="btn-entrar" style="margin-top:15px; height:50px">ENTRAR NO SISTEMA</button>
+            <p id="login-error" style="color:var(--danger); display:none; margin-top:10px"></p>
+            
+            <small style="display:block; margin-top:20px; color:#94a3b8; border-top:1px solid #eee; padding-top:10px">
+                Primeiro acesso? Use <b>admin@lablog.com</b>
+            </small>
         </div>
     </div>
 
@@ -119,6 +126,8 @@
 
         <div id="v-monitor" class="view">
             <div id="monitor-bg" class="monitor-layout">
+                <button id="fullscreen-btn" onclick="window.app.toggleFullScreen()" title="Tela Cheia"><i class="fas fa-expand"></i></button>
+
                 <div id="urgent-banner">AVISO DO SISTEMA</div>
                 
                 <div class="monitor-side-panel">
@@ -143,12 +152,12 @@
                 <input type="text" id="admin-notice" placeholder="Digite um aviso (Escreva 'URGENTE' para piscar vermelho)...">
                 <div style="display:flex; gap:10px">
                     <button class="btn btn-primary" onclick="window.app.postNotice()">📢 Postar no Telão</button>
-                    <button class="btn btn-danger" onclick="window.app.clearNotice()">❌ Limpar Aviso</button>
+                    <button class="btn btn-danger" onclick="window.app.clearNotice()">❌ Limpar</button>
                 </div>
             </div>
 
             <div class="card">
-                <h3><i class="fas fa-users-cog"></i> Gestão de Usuários e Cargos</h3>
+                <h3><i class="fas fa-users-cog"></i> Gestão de Usuários</h3>
                 <div style="display:flex; gap:10px; margin-bottom:15px; background:#f1f5f9; padding:10px; border-radius:8px">
                     <input type="text" id="new-user-email" placeholder="E-mail do colaborador" style="flex:2">
                     <select id="new-user-role" style="flex:1">
@@ -294,7 +303,6 @@ const db = getFirestore(firebaseApp);
 const auth = getAuth(firebaseApp);
 
 const app = {
-    // Adicionamos 'users' e 'notice' ao banco de dados
     data: { clients: [], salesHistory: [], routes: [], orders: [], reqs: [], losses: [], tags: [], users: [], notice: "" },
     currentUserRole: null,
 
@@ -310,32 +318,51 @@ const app = {
         });
         setInterval(() => this.monitorLoop(), 1000);
         setInterval(() => this.updateTimers(), 1000);
-        // Intervalo para rodar elogios no feed
         setInterval(() => this.rotateFeed(), 5000);
     },
 
     toggleMenu: function() { document.getElementById('sidebar').classList.toggle('active'); },
 
-    // --- LOGIN INTELIGENTE (Detecta Cargo) ---
+    // --- NOVO LOGIN PELA INTERFACE ---
     login: async function() {
-        const email = prompt("Email:");
-        const pass = prompt("Senha:");
+        const email = document.getElementById('login-email').value;
+        const pass = document.getElementById('login-pass').value;
+        const btn = document.getElementById('btn-entrar');
+        const err = document.getElementById('login-error');
+        
+        if(!email || !pass) { err.innerText="Preencha tudo."; err.style.display='block'; return; }
+        
+        btn.innerText = "ENTRANDO..."; btn.disabled = true;
+        
         try {
             await signInWithEmailAndPassword(auth, email, pass);
-            // O resto acontece no onAuthStateChanged
-        } catch (e) { alert("Erro: " + e.message); }
+            // Sucesso: o onAuthStateChanged cuida do resto
+        } catch (e) { 
+            err.innerText = "Erro: Email ou senha inválidos."; 
+            err.style.display='block';
+            btn.innerText = "ENTRAR NO SISTEMA"; btn.disabled = false;
+        }
     },
 
     logout: () => signOut(auth).then(()=>location.reload()),
+
+    // --- TELA CHEIA PARA O MONITOR ---
+    toggleFullScreen: function() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                alert(`Erro ao ativar tela cheia: ${err.message}`);
+            });
+        } else {
+            if (document.exitFullscreen) document.exitFullscreen();
+        }
+    },
 
     startRealtimeSync: function(email) {
         onSnapshot(doc(db, "config", "laboratorio"), (snap) => {
             if(snap.exists()) {
                 this.data = { ...this.data, ...snap.data() };
                 
-                // DETECTAR CARGO
-                // Se for o admin mestre ou estiver na lista
-                let role = 'vendas'; // Padrão
+                let role = 'vendas';
                 if(email === 'admin@lablog.com') role = 'admin';
                 else {
                     const u = (this.data.users||[]).find(x => x.email === email);
@@ -344,22 +371,15 @@ const app = {
                 
                 this.currentUserRole = role;
                 document.getElementById('role-badge').innerText = role.toUpperCase();
-                
-                // Renderiza Menu e Tela
                 this.renderMenu(role);
                 
-                // Se o usuário ainda está na tela de "nada", manda pra home dele
                 if(!document.querySelector('.view.active')) {
                     this.nav(role === 'telao' ? 'monitor' : (role === 'admin' ? 'admin' : 'vendas'));
                 } else {
                     this.refreshCurrentView();
                 }
-
-                // Checa Aviso Geral
                 this.checkNotice();
-                
             } else { 
-                // Inicializa banco se vazio
                 this.data.users = [{email:'admin@lablog.com', role:'admin'}];
                 this.save(); 
             }
@@ -406,27 +426,22 @@ const app = {
         }
     },
 
-    // --- GESTÃO DE USUÁRIOS (NOVO) ---
     addUser: function() {
         const email = document.getElementById('new-user-email').value.trim();
         const role = document.getElementById('new-user-role').value;
         if(!email) return;
-        
         if(!this.data.users) this.data.users = [];
-        // Remove se já existe para atualizar
         this.data.users = this.data.users.filter(u => u.email !== email);
         this.data.users.push({ email, role });
-        
         this.save();
         document.getElementById('new-user-email').value = "";
         this.renderUserList();
-        alert("Usuário adicionado! Ele precisa criar a senha no Firebase na primeira vez, ou você cria para ele.");
+        alert("Usuário adicionado! Ele precisa criar a senha no Firebase.");
     },
     removeUser: function(email) {
         if(confirm("Remover acesso de " + email + "?")) {
             this.data.users = this.data.users.filter(u => u.email !== email);
-            this.save();
-            this.renderUserList();
+            this.save(); this.renderUserList();
         }
     },
     renderUserList: function() {
@@ -437,66 +452,39 @@ const app = {
                 <i class="fas fa-user"></i>
                 <div style="flex:1"><b>${u.email}</b><br><small>${u.role.toUpperCase()}</small></div>
                 <button class="btn-mini" style="background:#fee2e2; color:red" onclick="window.app.removeUser('${u.email}')">Remover</button>
-            </div>
-        `).join('');
+            </div>`).join('');
     },
 
-    // --- AVISOS E ELOGIOS (NOVO) ---
     postNotice: function() {
         const txt = document.getElementById('admin-notice').value;
-        this.data.notice = txt;
-        this.save();
-        alert("Aviso atualizado no telão!");
+        this.data.notice = txt; this.save(); alert("Aviso atualizado!");
     },
     clearNotice: function() {
-        this.data.notice = "";
-        document.getElementById('admin-notice').value = "";
-        this.save();
+        this.data.notice = ""; document.getElementById('admin-notice').value = ""; this.save();
     },
     checkNotice: function() {
         const banner = document.getElementById('urgent-banner');
         const txt = this.data.notice;
-        
         if (txt && txt.length > 0) {
-            banner.style.display = 'block';
-            banner.innerText = txt;
-            if (txt.toLowerCase().includes('urgente')) {
-                banner.className = 'urgent-mode';
-            } else {
-                banner.className = 'normal-notice';
-            }
-        } else {
-            banner.style.display = 'none';
-        }
+            banner.style.display = 'block'; banner.innerText = txt;
+            if (txt.toLowerCase().includes('urgente')) banner.className = 'urgent-mode'; else banner.className = 'normal-notice';
+        } else { banner.style.display = 'none'; }
     },
     rotateFeed: function() {
         const feed = document.getElementById('monitor-feed');
         if(!feed || !this.data.orders) return;
-        
-        // Pega só elogios
         const elogios = this.data.orders.filter(o => o.type === 'Elogio');
-        
-        if(elogios.length === 0) {
-            feed.innerText = "LabLog - Sistema Online";
-            return;
-        }
-
-        // Loop simples
+        if(elogios.length === 0) { feed.innerText = "LabLog - Sistema Online"; return; }
         const item = elogios[Math.floor(Date.now() / 5000) % elogios.length];
-        feed.innerText = `ELOGIO DE ${item.cli}: "${item.obs}"`;
-        
-        // Reinicia animação
-        feed.style.animation = 'none';
-        feed.offsetHeight; /* trigger reflow */
-        feed.style.animation = 'fadeIn 1s';
+        // Correção aqui: se não tiver nome (cli), pega "Anônimo"
+        feed.innerText = `ELOGIO DE ${item.cli || 'CLIENTE'}: "${item.obs}"`;
+        feed.style.animation = 'none'; feed.offsetHeight; feed.style.animation = 'fadeIn 1s';
     },
 
-    // --- ADMIN ROTAS ---
     renderAdminRoutes: function() {
         const div = document.getElementById('admin-routes-list');
         if(!div) return;
-        let html = '';
-        html += (this.data.routes||[]).map((r, i) => `
+        div.innerHTML = (this.data.routes||[]).map((r, i) => `
             <div class="admin-route-row" id="row-${i}">
                 <input value="${r.name}" id="r-name-${i}" placeholder="Nome" style="font-weight:bold">
                 <input type="color" value="${r.c1}" id="r-c1-${i}" oninput="window.app.updatePreview(${i})">
@@ -506,9 +494,7 @@ const app = {
                 <input value="${r.e}" id="r-e-${i}" type="time" step="1">
                 <button class="btn btn-danger" onclick="window.app.removeRoute(${i})" style="padding:5px"><i class="fas fa-trash"></i></button>
                 <div id="preview-${i}" class="route-preview" style="background: linear-gradient(90deg, ${r.c1}, ${r.c2})"></div>
-            </div>
-        `).join('');
-        div.innerHTML = html;
+            </div>`).join('');
     },
     updatePreview: function(i) {
         const c1 = document.getElementById(`r-c1-${i}`).value;
@@ -539,24 +525,18 @@ const app = {
             e: document.getElementById(`r-e-${i}`).value
         }));
         tempRoutes.sort((a, b) => a.s.localeCompare(b.s));
-        
         let error = null;
         for (let i = 0; i < tempRoutes.length - 1; i++) {
             const currentEnd = tempRoutes[i].e;
             const nextStart = tempRoutes[i+1].s;
             const tEnd = this.hms(currentEnd);
             const tStart = this.hms(nextStart);
-            if (Math.abs(tStart - tEnd) > 1) { 
-                error = `ERRO DE HORÁRIO:\nRota "${tempRoutes[i].name}" acaba às ${currentEnd}, mas "${tempRoutes[i+1].name}" começa às ${nextStart}.`;
-                break;
-            }
+            if (Math.abs(tStart - tEnd) > 1) { error = `ERRO DE HORÁRIO:\nRota "${tempRoutes[i].name}" acaba às ${currentEnd}, mas "${tempRoutes[i+1].name}" começa às ${nextStart}.`; break; }
         }
         if (error) { alert(error); return; }
-        this.data.routes = tempRoutes;
-        this.save(); alert("Rotas salvas!"); this.renderAdminRoutes();
+        this.data.routes = tempRoutes; this.save(); alert("Rotas salvas!"); this.renderAdminRoutes();
     },
 
-    // --- CRM ---
     populateClientSelect: function() {
         const s = document.getElementById('crm-select');
         s.innerHTML = '<option value="">-- Selecione --</option>' + (this.data.clients||[]).map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
@@ -588,7 +568,6 @@ const app = {
         this.save(); document.getElementById('visit-note').value=""; this.loadClientCRM();
     },
 
-    // --- OUTROS ---
     handleTagInput: function(e) { 
         if(e.key==='Enter'||e.key===','){ e.preventDefault(); 
             const v=e.target.value.trim().toUpperCase(); 
@@ -615,8 +594,7 @@ const app = {
         document.querySelectorAll('.exp-timer').forEach(el=>{
             const d=Date.now()-parseInt(el.getAttribute('data-time'));
             const h=Math.floor(d/3600000), m=Math.floor((d%3600000)/60000);
-            el.innerText=`${h}h ${m}m`;
-            if(d>7200000) el.style.color='red';
+            el.innerText=`${h}h ${m}m`; if(d>7200000) el.style.color='red';
         });
     },
     addReq: function() {
@@ -626,16 +604,27 @@ const app = {
     },
     renderReqs: function() { document.getElementById('req-list').innerHTML = (this.data.reqs||[]).map(r=>`<div class="card" style="padding:10px"><b>${r.t}</b> (${r.s})<br>${r.d}</div>`).join(''); },
     searchCli: function(v) { const c = this.data.clients.find(x=>x.name.toLowerCase().includes(v.toLowerCase())); document.getElementById('at-match').innerText=c?c.name:""; },
+    
+    // --- CORREÇÃO AQUI: Garante o nome do cliente ---
     addOrder: function() {
-        const name = document.getElementById('at-match').innerText || "Anonimo";
+        // Tenta pegar do 'match' (busca automática). Se vazio, pega o que foi digitado no input.
+        let name = document.getElementById('at-match').innerText;
+        if (!name) name = document.getElementById('at-cod').value || "Cliente Anônimo";
+
         const c = this.data.clients.find(x=>x.name===name);
         const type = document.getElementById('at-type').value;
         const obs = document.getElementById('at-obs').value;
+        
         if(!this.data.orders) this.data.orders=[];
         this.data.orders.push({id:"P"+Date.now().toString().slice(-4), cli:name, route:c?c.route:'BALCAO', type, obs, time:Date.now()});
-        this.save(); alert(type === "Elogio" ? "Elogio enviado para o Telão!" : "Solicitação enviada!");
+        
+        this.save(); 
+        alert(type === "Elogio" ? "Elogio enviado para o Telão!" : "Solicitação enviada!");
         document.getElementById('at-obs').value="";
+        document.getElementById('at-cod').value="";
+        document.getElementById('at-match').innerText="";
     },
+    
     addLoss: function() {
         const i=document.getElementById('loss-item').value, v=parseFloat(document.getElementById('loss-val').value);
         if(!i||!v)return; if(!this.data.losses) this.data.losses=[];
