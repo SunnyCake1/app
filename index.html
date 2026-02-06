@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LabLog v9.2 - Full Mobile</title>
+    <title>LabLog v9.3 - Management</title>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -42,94 +42,49 @@
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-warning { background: var(--warning); color: #000; }
+        .btn-mini { padding: 5px; background: #e2e8f0; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; color: #64748b; }
+
+        /* ADMIN TABLE */
+        .admin-route-row { display: grid; grid-template-columns: 1.5fr 0.5fr 0.2fr 0.5fr 1fr 1fr 0.5fr; gap: 8px; align-items: center; padding: 12px; background: #fff; border: 1px solid #e2e8f0; margin-bottom: 8px; border-radius: 8px; }
+        .route-preview { height: 8px; border-radius: 4px; grid-column: 1 / -1; margin-top: 5px; border: 1px solid rgba(0,0,0,0.1); }
+        .user-row { display: flex; gap: 10px; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
 
         /* MONITOR */
         #v-monitor { padding: 0 !important; background: #000; color: #fff; }
-        .monitor-layout { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .monitor-side-panel { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.6); padding: 15px; border-radius: 10px; backdrop-filter: blur(5px); text-align: left; }
+        .monitor-layout { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; }
+        .monitor-side-panel { position: absolute; top: 80px; right: 20px; background: rgba(0,0,0,0.6); padding: 15px; border-radius: 10px; backdrop-filter: blur(5px); text-align: left; min-width: 250px; }
         .timer-big { font-size: 8vw; font-family: monospace; font-weight: 900; background: rgba(0,0,0,0.5); padding: 10px 30px; border-radius: 15px; border: 2px solid #fff; margin-top: 10px; }
         .timer-blink-red { animation: blink 1s infinite; background: #ef4444 !important; border-color: #ef4444 !important; }
-        @keyframes blink { 50% { opacity: 0.5; } }
+        
+        /* AVISO URGENTE */
+        #urgent-banner { 
+            position: absolute; top: 0; left: 0; width: 100%; padding: 15px; 
+            font-size: 2rem; font-weight: 900; text-align: center; z-index: 99; display: none;
+            text-transform: uppercase; letter-spacing: 2px;
+        }
+        .urgent-mode { background: #ef4444; color: white; animation: blink 0.5s infinite; }
+        .normal-notice { background: var(--accent); color: #000; }
 
-        /* EXPEDIÇÃO */
-        .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
-        .filter-btn { padding: 8px 16px; border: 1px solid #cbd5e1; background: #fff; border-radius: 20px; white-space: nowrap; cursor: pointer; }
-        .filter-btn.active { background: var(--primary); color: #fff; }
-        .exp-card { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 10px; display: flex; overflow: hidden; }
-        .exp-strip { width: 10px; }
-        .exp-content { padding: 15px; flex: 1; display: flex; justify-content: space-between; align-items: center; }
-        .tag-chip { background: #0f172a; color: #fff; padding: 5px 10px; border-radius: 15px; display: inline-flex; align-items: center; gap: 5px; margin: 2px; font-size: 0.8rem; }
+        /* ELOGIOS FEED */
+        .feed-bar { position: absolute; bottom: 30px; background: rgba(0,0,0,0.6); padding: 15px 40px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.3); max-width: 80%; }
+        .feed-text { font-size: 1.5rem; font-weight: bold; font-style: italic; color: #fff; animation: fadeIn 1s; }
 
-        /* ADMIN */
-        .admin-route-row { display: grid; grid-template-columns: 2fr 0.5fr 0.5fr 1fr 1fr 0.5fr; gap: 5px; align-items: center; padding: 10px; background: #f8fafc; border: 1px solid #eee; margin-bottom: 5px; border-radius: 8px; }
-
-        /* CRM */
-        .kpi-row { display: flex; gap: 10px; margin-bottom: 15px; }
-        .kpi-card { flex: 1; background: #f1f5f9; padding: 10px; border-radius: 8px; text-align: center; border-top: 3px solid #ccc; }
-        .suggestion-box { background: #ecfdf5; border: 1px solid #6ee7b7; color: #065f46; padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 0.9rem; }
+        @keyframes blink { 50% { opacity: 0.8; background: #b91c1c; } }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
         /* MOBILE RESPONSIVE */
         @media (max-width: 768px) {
             aside { position: fixed; left: -260px; height: 100%; box-shadow: 5px 0 15px rgba(0,0,0,0.2); }
             aside.active { left: 0; }
             #mobile-btn { display: block; }
-            
             #monitor-rota { font-size: 15vw !important; line-height: 1.1; }
             .timer-big { font-size: 18vw; padding: 5px 15px; width: 80%; }
             .monitor-side-panel { position: relative; top: auto; right: auto; width: 90%; margin-bottom: 20px; }
-            
             .admin-route-row { display: flex; flex-direction: column; border-left: 5px solid var(--primary); }
             .admin-route-header { display: none; }
+            #urgent-banner { font-size: 1.2rem; }
         }
 
-        /* --- ATUALIZE NO SEU CSS --- */
-.admin-route-row { 
-    display: grid; 
-    /* Ajustei as colunas para caber o botão de igualar e o preview */
-    grid-template-columns: 1.5fr 0.5fr 0.2fr 0.5fr 1fr 1fr 0.5fr; 
-    gap: 8px; 
-    align-items: center; 
-    padding: 12px; 
-    background: #fff; 
-    border: 1px solid #e2e8f0; 
-    margin-bottom: 8px; 
-    border-radius: 8px; 
-    transition: 0.2s;
-}
-
-/* Barra de preview do gradiente */
-.route-preview {
-    height: 8px;
-    border-radius: 4px;
-    grid-column: 1 / -1; /* Ocupa a linha toda abaixo dos inputs */
-    margin-top: 5px;
-    border: 1px solid rgba(0,0,0,0.1);
-}
-
-/* Botão pequeno de igualar cor */
-.btn-mini {
-    padding: 5px;
-    background: #e2e8f0;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.8rem;
-    color: #64748b;
-}
-.btn-mini:hover { background: #cbd5e1; color: #000; }
-
-/* No Mobile, ajustamos para ficar bonito */
-@media (max-width: 768px) {
-    .admin-route-row { 
-        display: flex; 
-        flex-direction: column; 
-        gap: 10px;
-        border-left: 5px solid var(--primary);
-    }
-    .route-preview { width: 100%; height: 15px; }
-}
-
-        /* LOGIN */
         #login-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
         .login-box { background: white; padding: 30px; border-radius: 16px; width: 90%; max-width: 350px; text-align: center; }
     </style>
@@ -138,16 +93,10 @@
 
     <div id="login-overlay">
         <div class="login-box">
-            <h1 style="color:var(--primary)">LabLog <span style="color:var(--accent)">9.2</span></h1>
-            <p style="color:#64748b">Sistema Completo</p>
-            <select id="user-role">
-                <option value="admin">👑 ADMIN / GERÊNCIA</option>
-                <option value="vendas">💼 VENDEDOR</option>
-                <option value="atend">☎️ ATENDIMENTO</option>
-                <option value="exped">📦 EXPEDIÇÃO</option>
-                <option value="telao">📺 MONITOR</option>
-            </select>
-            <button class="btn btn-primary" onclick="window.app.login()">ACESSAR</button>
+            <h1 style="color:var(--primary)">LabLog <span style="color:var(--accent)">9.3</span></h1>
+            <p style="color:#64748b">ERP Ótico</p>
+            <button class="btn btn-primary" onclick="window.app.login()">ENTRAR COM E-MAIL</button>
+            <small style="display:block; margin-top:15px; color:#999">Primeiro acesso? Use admin@lablog.com</small>
         </div>
     </div>
 
@@ -165,42 +114,73 @@
                 <button id="mobile-btn" onclick="window.app.toggleMenu()"><i class="fas fa-bars"></i></button>
                 <h3 id="page-title" style="margin:0">Dashboard</h3>
             </div>
-            <div style="font-size:0.8rem; color:#64748b"><i class="far fa-user-circle"></i> <span id="user-display">User</span></div>
+            <div style="font-size:0.8rem; color:#64748b"><i class="far fa-user-circle"></i> <span id="user-display">User</span> <span id="role-badge" style="background:var(--primary); color:#fff; padding:2px 6px; border-radius:4px; font-size:0.7rem">...</span></div>
         </header>
 
         <div id="v-monitor" class="view">
             <div id="monitor-bg" class="monitor-layout">
+                <div id="urgent-banner">AVISO DO SISTEMA</div>
+                
                 <div class="monitor-side-panel">
                     <h4 style="margin:0 0 10px 0; color:#fff; border-bottom:1px solid #fff;">PRÓXIMAS ROTAS</h4>
                     <div id="monitor-schedule-list"></div>
                 </div>
+                
                 <div style="font-size: 1rem; opacity: 0.8; margin-top:20px">ROTA ATUAL</div>
                 <div id="monitor-rota" style="font-size: 6vw; font-weight: 900; text-transform: uppercase;">---</div>
                 <div id="monitor-timer" class="timer-big">00:00:00</div>
-                <div style="margin-top: 30px; background: rgba(0,0,0,0.4); padding: 10px 20px; border-radius: 50px;">
-                    <i class="fas fa-comment-alt" style="color:var(--accent)"></i> <span id="monitor-feed">Sistema Online</span>
+                
+                <div class="feed-bar">
+                    <i class="fas fa-comment-alt" style="color:var(--accent); font-size:1.5rem; margin-right:10px"></i> 
+                    <span id="monitor-feed" class="feed-text">Sistema Online</span>
                 </div>
             </div>
         </div>
 
         <div id="v-admin" class="view">
+            <div class="card" style="border-left: 5px solid var(--accent)">
+                <h3><i class="fas fa-bullhorn"></i> Quadro de Avisos (Monitor)</h3>
+                <input type="text" id="admin-notice" placeholder="Digite um aviso (Escreva 'URGENTE' para piscar vermelho)...">
+                <div style="display:flex; gap:10px">
+                    <button class="btn btn-primary" onclick="window.app.postNotice()">📢 Postar no Telão</button>
+                    <button class="btn btn-danger" onclick="window.app.clearNotice()">❌ Limpar Aviso</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-users-cog"></i> Gestão de Usuários e Cargos</h3>
+                <div style="display:flex; gap:10px; margin-bottom:15px; background:#f1f5f9; padding:10px; border-radius:8px">
+                    <input type="text" id="new-user-email" placeholder="E-mail do colaborador" style="flex:2">
+                    <select id="new-user-role" style="flex:1">
+                        <option value="vendas">Vendas</option>
+                        <option value="atend">Atendimento</option>
+                        <option value="exped">Expedição</option>
+                        <option value="admin">Admin</option>
+                        <option value="telao">Telão</option>
+                    </select>
+                    <button class="btn btn-success" style="flex:1" onclick="window.app.addUser()">+ Adicionar</button>
+                </div>
+                <div id="user-list"></div>
+            </div>
+
             <div class="card">
                 <h3>Configuração de Rotas</h3>
                 <div class="admin-route-row admin-route-header">
-                    <div>Nome</div>
-                    <div>Cor 1</div>
-                    <div></div> <div>Cor 2</div>
-                    <div>Início</div>
-                    <div>Fim</div>
-                    <div>Del</div>
-            </div>
+                    <div>Nome</div><div>Cor 1</div><div></div><div>Cor 2</div><div>Início</div><div>Fim</div><div>Del</div>
+                </div>
                 <div id="admin-routes-list"></div>
-                <button class="btn btn-success" onclick="window.app.addRouteRow()">+ Rota</button>
-                <button class="btn btn-primary" onclick="window.app.saveRoutesAdmin()">Salvar</button>
+                <div style="display:flex; justify-content:space-between; margin-top:10px">
+                    <button class="btn-mini" onclick="window.app.unifyAllColors()"><i class="fas fa-paint-roller"></i> Sólido</button>
+                    <div style="display:flex; gap:10px">
+                        <button class="btn btn-success" onclick="window.app.addRouteRow()">+ Rota</button>
+                        <button class="btn btn-primary" onclick="window.app.saveRoutesAdmin()">Salvar Rotas</button>
+                    </div>
+                </div>
             </div>
+            
             <div class="card">
                 <h3>Importar Dados</h3>
-                <div class="kpi-row">
+                <div style="display:flex; gap:10px">
                     <button class="btn btn-warning" onclick="document.getElementById('file-cli').click()">Clientes CSV</button>
                     <input type="file" id="file-cli" hidden onchange="window.app.importCSV('clients', this)">
                     <button class="btn btn-warning" onclick="document.getElementById('file-sales').click()">Vendas CSV</button>
@@ -216,7 +196,6 @@
                     <option value="">-- Selecione --</option>
                 </select>
             </div>
-
             <div id="crm-content" style="display:none">
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center">
@@ -228,9 +207,7 @@
                         <div class="kpi-card" style="border-top-color:var(--accent)"><small>TICKET</small><br><b id="kpi-ticket">R$ 0</b></div>
                     </div>
                     <div><canvas id="salesChart" style="max-height:200px"></canvas></div>
-                    <div class="suggestion-box"><i class="fas fa-lightbulb"></i> <span id="crm-suggestion">...</span></div>
                 </div>
-                
                 <div class="card">
                     <h3>Registrar Visita</h3>
                     <textarea id="visit-note" rows="3" placeholder="O que foi conversado?"></textarea>
@@ -271,12 +248,13 @@
 
         <div id="v-atend" class="view">
             <div class="card">
-                <h3>Solicitação / Coleta</h3>
+                <h3>Solicitação / Coleta / Elogio</h3>
                 <input type="text" id="at-cod" placeholder="Cliente..." oninput="window.app.searchCli(this.value)">
                 <small id="at-match" style="color:var(--success)"></small>
                 <select id="at-type"><option>Coleta</option><option>Elogio</option><option>Reclamacao</option></select>
-                <textarea id="at-obs" placeholder="Obs..."></textarea>
+                <textarea id="at-obs" placeholder="Obs / Elogio..."></textarea>
                 <button class="btn btn-accent" onclick="window.app.addOrder()">Enviar</button>
+                <p style="font-size:0.8rem; color:#666; margin-top:10px">*Se selecionar "Elogio", aparecerá no Telão!</p>
             </div>
         </div>
 
@@ -316,39 +294,77 @@ const db = getFirestore(firebaseApp);
 const auth = getAuth(firebaseApp);
 
 const app = {
-    data: { clients: [], salesHistory: [], routes: [], orders: [], reqs: [], losses: [], tags: [], filter: 'TODOS' },
+    // Adicionamos 'users' e 'notice' ao banco de dados
+    data: { clients: [], salesHistory: [], routes: [], orders: [], reqs: [], losses: [], tags: [], users: [], notice: "" },
+    currentUserRole: null,
 
     init: function() {
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('user-display').innerText = user.email.split('@')[0];
-                const savedRole = localStorage.getItem('userRole') || 'admin';
-                this.renderMenu(savedRole);
-                this.startRealtimeSync();
+                this.startRealtimeSync(user.email);
             } else {
                 document.getElementById('login-overlay').style.display = 'flex';
             }
         });
         setInterval(() => this.monitorLoop(), 1000);
         setInterval(() => this.updateTimers(), 1000);
+        // Intervalo para rodar elogios no feed
+        setInterval(() => this.rotateFeed(), 5000);
     },
 
     toggleMenu: function() { document.getElementById('sidebar').classList.toggle('active'); },
 
+    // --- LOGIN INTELIGENTE (Detecta Cargo) ---
     login: async function() {
-        const role = document.getElementById('user-role').value;
         const email = prompt("Email:");
         const pass = prompt("Senha:");
         try {
             await signInWithEmailAndPassword(auth, email, pass);
-            localStorage.setItem('userRole', role);
-            this.renderMenu(role);
-            this.nav(role === 'telao' ? 'monitor' : 'admin');
+            // O resto acontece no onAuthStateChanged
         } catch (e) { alert("Erro: " + e.message); }
     },
 
     logout: () => signOut(auth).then(()=>location.reload()),
+
+    startRealtimeSync: function(email) {
+        onSnapshot(doc(db, "config", "laboratorio"), (snap) => {
+            if(snap.exists()) {
+                this.data = { ...this.data, ...snap.data() };
+                
+                // DETECTAR CARGO
+                // Se for o admin mestre ou estiver na lista
+                let role = 'vendas'; // Padrão
+                if(email === 'admin@lablog.com') role = 'admin';
+                else {
+                    const u = (this.data.users||[]).find(x => x.email === email);
+                    if(u) role = u.role;
+                }
+                
+                this.currentUserRole = role;
+                document.getElementById('role-badge').innerText = role.toUpperCase();
+                
+                // Renderiza Menu e Tela
+                this.renderMenu(role);
+                
+                // Se o usuário ainda está na tela de "nada", manda pra home dele
+                if(!document.querySelector('.view.active')) {
+                    this.nav(role === 'telao' ? 'monitor' : (role === 'admin' ? 'admin' : 'vendas'));
+                } else {
+                    this.refreshCurrentView();
+                }
+
+                // Checa Aviso Geral
+                this.checkNotice();
+                
+            } else { 
+                // Inicializa banco se vazio
+                this.data.users = [{email:'admin@lablog.com', role:'admin'}];
+                this.save(); 
+            }
+        });
+    },
 
     renderMenu: function(role) {
         const m = document.getElementById('menu-nav');
@@ -369,20 +385,11 @@ const app = {
         document.getElementById('page-title').innerText = v.toUpperCase();
         
         if(v==='vendas') this.populateClientSelect();
-        if(v==='admin') this.renderAdminRoutes();
+        if(v==='admin') { this.renderAdminRoutes(); this.renderUserList(); }
         if(v==='monitor') this.renderMonitorSidePanel();
         if(v==='reqs') this.renderReqs();
         if(v==='exped') this.renderExped();
         if(v==='perdas') this.renderLosses();
-    },
-
-    startRealtimeSync: function() {
-        onSnapshot(doc(db, "config", "laboratorio"), (snap) => {
-            if(snap.exists()) {
-                this.data = { ...this.data, ...snap.data() };
-                this.refreshCurrentView();
-            } else { this.save(); }
-        });
     },
 
     save: async function() { await setDoc(doc(db, "config", "laboratorio"), this.data); },
@@ -391,7 +398,7 @@ const app = {
         const active = document.querySelector('.view.active');
         if(active) {
             const id = active.id.replace('v-','');
-            if(id==='admin') this.renderAdminRoutes();
+            if(id==='admin') { this.renderAdminRoutes(); this.renderUserList(); }
             if(id==='monitor') this.renderMonitorSidePanel();
             if(id==='exped') this.renderExped();
             if(id==='reqs') this.renderReqs();
@@ -399,93 +406,131 @@ const app = {
         }
     },
 
-    // --- ADMIN ---
+    // --- GESTÃO DE USUÁRIOS (NOVO) ---
+    addUser: function() {
+        const email = document.getElementById('new-user-email').value.trim();
+        const role = document.getElementById('new-user-role').value;
+        if(!email) return;
+        
+        if(!this.data.users) this.data.users = [];
+        // Remove se já existe para atualizar
+        this.data.users = this.data.users.filter(u => u.email !== email);
+        this.data.users.push({ email, role });
+        
+        this.save();
+        document.getElementById('new-user-email').value = "";
+        this.renderUserList();
+        alert("Usuário adicionado! Ele precisa criar a senha no Firebase na primeira vez, ou você cria para ele.");
+    },
+    removeUser: function(email) {
+        if(confirm("Remover acesso de " + email + "?")) {
+            this.data.users = this.data.users.filter(u => u.email !== email);
+            this.save();
+            this.renderUserList();
+        }
+    },
+    renderUserList: function() {
+        const div = document.getElementById('user-list');
+        if(!div) return;
+        div.innerHTML = (this.data.users||[]).map(u => `
+            <div class="user-row">
+                <i class="fas fa-user"></i>
+                <div style="flex:1"><b>${u.email}</b><br><small>${u.role.toUpperCase()}</small></div>
+                <button class="btn-mini" style="background:#fee2e2; color:red" onclick="window.app.removeUser('${u.email}')">Remover</button>
+            </div>
+        `).join('');
+    },
+
+    // --- AVISOS E ELOGIOS (NOVO) ---
+    postNotice: function() {
+        const txt = document.getElementById('admin-notice').value;
+        this.data.notice = txt;
+        this.save();
+        alert("Aviso atualizado no telão!");
+    },
+    clearNotice: function() {
+        this.data.notice = "";
+        document.getElementById('admin-notice').value = "";
+        this.save();
+    },
+    checkNotice: function() {
+        const banner = document.getElementById('urgent-banner');
+        const txt = this.data.notice;
+        
+        if (txt && txt.length > 0) {
+            banner.style.display = 'block';
+            banner.innerText = txt;
+            if (txt.toLowerCase().includes('urgente')) {
+                banner.className = 'urgent-mode';
+            } else {
+                banner.className = 'normal-notice';
+            }
+        } else {
+            banner.style.display = 'none';
+        }
+    },
+    rotateFeed: function() {
+        const feed = document.getElementById('monitor-feed');
+        if(!feed || !this.data.orders) return;
+        
+        // Pega só elogios
+        const elogios = this.data.orders.filter(o => o.type === 'Elogio');
+        
+        if(elogios.length === 0) {
+            feed.innerText = "LabLog - Sistema Online";
+            return;
+        }
+
+        // Loop simples
+        const item = elogios[Math.floor(Date.now() / 5000) % elogios.length];
+        feed.innerText = `ELOGIO DE ${item.cli}: "${item.obs}"`;
+        
+        // Reinicia animação
+        feed.style.animation = 'none';
+        feed.offsetHeight; /* trigger reflow */
+        feed.style.animation = 'fadeIn 1s';
+    },
+
+    // --- ADMIN ROTAS ---
     renderAdminRoutes: function() {
         const div = document.getElementById('admin-routes-list');
         if(!div) return;
-        
-        // Cabeçalho com botão extra
-        let html = `
-            <div style="display:flex; justify-content:flex-end; margin-bottom:10px;">
-                <button class="btn-mini" onclick="window.app.unifyAllColors()" style="padding:5px 15px">
-                    <i class="fas fa-paint-roller"></i> Tirar Gradientes (Todas Sólidas)
-                </button>
-            </div>
-        `;
-
+        let html = '';
         html += (this.data.routes||[]).map((r, i) => `
             <div class="admin-route-row" id="row-${i}">
-                <input value="${r.name}" id="r-name-${i}" placeholder="Nome da Rota" style="font-weight:bold">
-                
-                <input type="color" value="${r.c1}" id="r-c1-${i}" 
-                       oninput="window.app.updatePreview(${i})">
-                
-                <button class="btn-mini" title="Copiar Cor 1 para Cor 2" onclick="window.app.copyColorRow(${i})">
-                    <i class="fas fa-arrow-right"></i>
-                </button>
-
-                <input type="color" value="${r.c2}" id="r-c2-${i}" 
-                       oninput="window.app.updatePreview(${i})">
-
+                <input value="${r.name}" id="r-name-${i}" placeholder="Nome" style="font-weight:bold">
+                <input type="color" value="${r.c1}" id="r-c1-${i}" oninput="window.app.updatePreview(${i})">
+                <button class="btn-mini" onclick="window.app.copyColorRow(${i})"><i class="fas fa-arrow-right"></i></button>
+                <input type="color" value="${r.c2}" id="r-c2-${i}" oninput="window.app.updatePreview(${i})">
                 <input value="${r.s}" id="r-s-${i}" type="time" step="1">
                 <input value="${r.e}" id="r-e-${i}" type="time" step="1">
-                
                 <button class="btn btn-danger" onclick="window.app.removeRoute(${i})" style="padding:5px"><i class="fas fa-trash"></i></button>
-                
-                <div id="preview-${i}" class="route-preview" 
-                     style="background: linear-gradient(90deg, ${r.c1}, ${r.c2})"></div>
+                <div id="preview-${i}" class="route-preview" style="background: linear-gradient(90deg, ${r.c1}, ${r.c2})"></div>
             </div>
         `).join('');
-
         div.innerHTML = html;
     },
-
-    // --- NOVA FUNÇÃO DEDICADA AO MONITOR ---
-    renderMonitorSidePanel: function() {
-        const listEl = document.getElementById('monitor-schedule-list');
-        if(!listEl) return;
-        
-        // Agora ele limpa e redesenha sempre que for chamado
-        listEl.innerHTML = (this.data.routes||[]).sort((a,b)=>a.s.localeCompare(b.s)).map(r => `
-            <div style="margin-bottom:8px; color:#fff; display:flex; align-items:center; gap:8px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px">
-                <span style="color:${r.c1}; font-size:1.2rem;">●</span> 
-                <span style="font-weight:600">${r.name}</span> 
-                <span style="opacity:0.8; font-size:0.9rem; margin-left:auto; font-family:monospace">${r.s.substring(0,5)} - ${r.e.substring(0,5)}</span>
-            </div>
-        `).join('');
-    },
-    
-    // Atualiza a barrinha colorida em tempo real
     updatePreview: function(i) {
         const c1 = document.getElementById(`r-c1-${i}`).value;
         const c2 = document.getElementById(`r-c2-${i}`).value;
         document.getElementById(`preview-${i}`).style.background = `linear-gradient(90deg, ${c1}, ${c2})`;
     },
-
-    // Copia C1 para C2 na linha específica
     copyColorRow: function(i) {
         const c1 = document.getElementById(`r-c1-${i}`).value;
         document.getElementById(`r-c2-${i}`).value = c1;
-        this.updatePreview(i); // Atualiza visual
+        this.updatePreview(i);
     },
-
-    // Deixa TODAS as rotas com cor sólida (C2 vira igual C1)
     unifyAllColors: function() {
-        if(!confirm("Isso vai remover o gradiente de todas as rotas (copiando a Cor 1 para a Cor 2). Continuar?")) return;
-        
-        // Aplica na tela
+        if(!confirm("Copiar Cor 1 para Cor 2 em todas as rotas?")) return;
         this.data.routes.forEach((_, i) => {
             const c1 = document.getElementById(`r-c1-${i}`).value;
             document.getElementById(`r-c2-${i}`).value = c1;
             this.updatePreview(i);
         });
     },
-    
     addRouteRow: function() { if(!this.data.routes) this.data.routes=[]; this.data.routes.push({name:"Nova",c1:"#000",c2:"#fff",s:"00:00:00",e:"00:00:00"}); this.renderAdminRoutes(); },
     removeRoute: function(i) { if(confirm("Apagar?")){this.data.routes.splice(i,1); this.save();} },
-    // --- SALVAR COM VALIDAÇÃO DE HORÁRIO ---
     saveRoutesAdmin: function() {
-        // 1. Captura os valores da tela para a memória
         const tempRoutes = this.data.routes.map((_, i) => ({
             name: document.getElementById(`r-name-${i}`).value,
             c1: document.getElementById(`r-c1-${i}`).value,
@@ -493,36 +538,22 @@ const app = {
             s: document.getElementById(`r-s-${i}`).value,
             e: document.getElementById(`r-e-${i}`).value
         }));
-
-        // 2. Ordena por horário de início para checar sequência
         tempRoutes.sort((a, b) => a.s.localeCompare(b.s));
-
-        // 3. Validação de "Buracos"
+        
         let error = null;
         for (let i = 0; i < tempRoutes.length - 1; i++) {
-            const currentEnd = tempRoutes[i].e; // Fim da atual (ex: 10:00:00)
-            const nextStart = tempRoutes[i+1].s; // Início da próxima
-            
-            // Aceita diferença de até 1 segundo
+            const currentEnd = tempRoutes[i].e;
+            const nextStart = tempRoutes[i+1].s;
             const tEnd = this.hms(currentEnd);
             const tStart = this.hms(nextStart);
-
             if (Math.abs(tStart - tEnd) > 1) { 
-                error = `ERRO DE HORÁRIO:\nA rota "${tempRoutes[i].name}" termina às ${currentEnd}, mas a próxima rota "${tempRoutes[i+1].name}" só começa às ${nextStart}.\n\nCorrija o intervalo!`;
+                error = `ERRO DE HORÁRIO:\nRota "${tempRoutes[i].name}" acaba às ${currentEnd}, mas "${tempRoutes[i+1].name}" começa às ${nextStart}.`;
                 break;
             }
         }
-
-        if (error) {
-            alert(error); // Trava o salvamento
-            return; 
-        }
-
-        // 4. Se passou, salva no Firebase
+        if (error) { alert(error); return; }
         this.data.routes = tempRoutes;
-        this.save();
-        alert("Rotas validadas e salvas com sucesso!");
-        this.renderAdminRoutes(); // Redesenha para garantir a ordem visual
+        this.save(); alert("Rotas salvas!"); this.renderAdminRoutes();
     },
 
     // --- CRM ---
@@ -538,20 +569,14 @@ const app = {
         const c = this.data.clients.find(x=>x.id===id);
         document.getElementById('crm-name').innerText = c.name;
         document.getElementById('crm-route').innerText = "ROTA "+c.route;
-        
-        // KPIs
         const sales = (this.data.salesHistory||[]).filter(s=>s.cli===c.name);
         const fat = sales.reduce((a,b)=>a+b.val,0);
         document.getElementById('kpi-fat').innerText = "R$ "+fat.toFixed(2);
         document.getElementById('kpi-ticket').innerText = "R$ "+(sales.length?fat/sales.length:0).toFixed(2);
-        
-        // Chart
         const ctx = document.getElementById('salesChart');
         if(window.myChart) window.myChart.destroy();
         const d={}; sales.forEach(s=>d[s.prod]=(d[s.prod]||0)+s.val);
         window.myChart = new Chart(ctx, {type:'bar', data:{labels:Object.keys(d), datasets:[{label:'Vendas',data:Object.values(d),backgroundColor:'#38bdf8'}]}});
-        
-        // Visits
         document.getElementById('visit-history').innerHTML = (c.visits||[]).map(v=>`<div style="border-bottom:1px solid #eee; padding:5px"><small>${v.date}</small><br>${v.note}</div>`).join('');
     },
     addVisit: function() {
@@ -563,7 +588,7 @@ const app = {
         this.save(); document.getElementById('visit-note').value=""; this.loadClientCRM();
     },
 
-    // --- EXPEDIÇÃO ---
+    // --- OUTROS ---
     handleTagInput: function(e) { 
         if(e.key==='Enter'||e.key===','){ e.preventDefault(); 
             const v=e.target.value.trim().toUpperCase(); 
@@ -575,17 +600,10 @@ const app = {
             e.target.value=""; 
         }
     },
-    renderTags: function() {
-        const area = document.getElementById('tag-area');
-        area.innerHTML = (this.data.tags||[]).map(t=>`<div class="tag-chip">${t} <span onclick="window.app.removeTag('${t}')" style="cursor:pointer;margin-left:5px">×</span></div>`).join('');
-    },
+    renderTags: function() { document.getElementById('tag-area').innerHTML = (this.data.tags||[]).map(t=>`<div class="tag-chip">${t} <span onclick="window.app.removeTag('${t}')" style="cursor:pointer;margin-left:5px">×</span></div>`).join(''); },
     removeTag: function(t) { this.data.tags=this.data.tags.filter(x=>x!==t); this.renderTags(); },
     printLote: function() { alert("Imprimindo: "+this.data.tags.join(", ")); },
-    filterExped: function(f, btn) { 
-        this.data.filter=f; 
-        document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); 
-        this.renderExped(); 
-    },
+    filterExped: function(f, btn) { this.data.filter=f; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); this.renderExped(); },
     renderExped: function() {
         const l = document.getElementById('exped-list');
         const f = (this.data.orders||[]).filter(o => this.data.filter==='TODOS' || (o.route||'').includes(this.data.filter));
@@ -601,30 +619,26 @@ const app = {
             if(d>7200000) el.style.color='red';
         });
     },
-
-    // --- REQUISIÇÕES & ATENDIMENTO & PERDAS ---
     addReq: function() {
         const s=document.getElementById('req-sector').value, t=document.getElementById('req-type').value, d=document.getElementById('req-desc').value;
-        if(!d)return;
-        if(!this.data.reqs) this.data.reqs=[];
+        if(!d)return; if(!this.data.reqs) this.data.reqs=[];
         this.data.reqs.push({id:Date.now(), s, t, d}); this.save(); this.renderReqs(); document.getElementById('req-desc').value="";
     },
     renderReqs: function() { document.getElementById('req-list').innerHTML = (this.data.reqs||[]).map(r=>`<div class="card" style="padding:10px"><b>${r.t}</b> (${r.s})<br>${r.d}</div>`).join(''); },
-    
     searchCli: function(v) { const c = this.data.clients.find(x=>x.name.toLowerCase().includes(v.toLowerCase())); document.getElementById('at-match').innerText=c?c.name:""; },
     addOrder: function() {
         const name = document.getElementById('at-match').innerText || "Anonimo";
         const c = this.data.clients.find(x=>x.name===name);
         const type = document.getElementById('at-type').value;
+        const obs = document.getElementById('at-obs').value;
         if(!this.data.orders) this.data.orders=[];
-        this.data.orders.push({id:"P"+Date.now().toString().slice(-4), cli:name, route:c?c.route:'BALCAO', type, time:Date.now()});
-        this.save(); alert("Enviado para Expedição!");
+        this.data.orders.push({id:"P"+Date.now().toString().slice(-4), cli:name, route:c?c.route:'BALCAO', type, obs, time:Date.now()});
+        this.save(); alert(type === "Elogio" ? "Elogio enviado para o Telão!" : "Solicitação enviada!");
+        document.getElementById('at-obs').value="";
     },
-    
     addLoss: function() {
         const i=document.getElementById('loss-item').value, v=parseFloat(document.getElementById('loss-val').value);
-        if(!i||!v)return;
-        if(!this.data.losses) this.data.losses=[];
+        if(!i||!v)return; if(!this.data.losses) this.data.losses=[];
         this.data.losses.push({item:i, val:v}); this.save(); this.renderLosses();
     },
     renderLosses: function() {
@@ -632,11 +646,8 @@ const app = {
         document.getElementById('loss-total').innerText = "R$ "+t.toFixed(2);
         document.getElementById('loss-history').innerHTML = (this.data.losses||[]).slice(-5).map(l=>`<li>${l.item}: R$${l.val}</li>`).join('');
     },
-
-    // --- UTIL ---
     importCSV: function(type, input) {
-        const file = input.files[0];
-        const reader = new FileReader();
+        const file = input.files[0]; const reader = new FileReader();
         reader.onload = (e) => {
             const rows = e.target.result.split('\n');
             if(type==='clients') this.data.clients = rows.map(r=>{ const[id,n,rt]=r.split(','); return id?{id:id.trim(),name:n.trim(),route:rt?rt.trim():'GERAL',visits:[]}:null; }).filter(x=>x);
@@ -645,9 +656,15 @@ const app = {
         }
         reader.readAsText(file);
     },
+    renderMonitorSidePanel: function() {
+        const listEl = document.getElementById('monitor-schedule-list');
+        if(!listEl) return;
+        listEl.innerHTML = (this.data.routes||[]).sort((a,b)=>a.s.localeCompare(b.s)).map(r => `
+            <div style="margin-bottom:8px; color:#fff; display:flex; align-items:center; gap:8px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px">
+                <span style="color:${r.c1}; font-size:1.2rem;">●</span> <span style="font-weight:600">${r.name}</span> <span style="opacity:0.8; font-size:0.9rem; margin-left:auto; font-family:monospace">${r.s.substring(0,5)} - ${r.e.substring(0,5)}</span>
+            </div>`).join('');
+    },
     hms: s => { const p=s.split(':').map(Number); return (p[0]*3600)+(p[1]*60)+(p[2]||0); },
-
-    // --- MONITOR ---
     monitorLoop: function() {
         const now = new Date();
         const sec = (now.getHours()*3600) + (now.getMinutes()*60) + now.getSeconds();
@@ -655,30 +672,22 @@ const app = {
             const s = this.hms(r.s), e = this.hms(r.e);
             return s > e ? (sec >= s || sec <= e) : (sec >= s && sec <= e);
         });
-
         if(active && document.getElementById('monitor-rota')) {
             document.getElementById('monitor-bg').style.background = `linear-gradient(135deg, ${active.c1}, ${active.c2})`;
             document.getElementById('monitor-rota').innerText = active.name;
-            
-            // Lógica do Timer
             const e = this.hms(active.e); let t = new Date(); t.setHours(Math.floor(e/3600), Math.floor((e%3600)/60), e%60, 0);
             if(t < now) t.setDate(t.getDate()+1);
             const diff = t - now;
             const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
-            
             const timer = document.getElementById('monitor-timer');
             timer.innerText = `${h<10?'0'+h:h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
-            
-            if(diff < 900000) timer.classList.add('timer-blink-red'); 
-            else timer.classList.remove('timer-blink-red');
+            if(diff < 900000) timer.classList.add('timer-blink-red'); else timer.classList.remove('timer-blink-red');
         }
     }
 };
+
 window.app = app;
 app.init();
 </script>
 </body>
 </html>
-
-
-
